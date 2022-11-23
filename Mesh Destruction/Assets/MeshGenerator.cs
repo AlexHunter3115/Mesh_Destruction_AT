@@ -12,7 +12,7 @@ using static UnityEngine.UI.Image;
 [RequireComponent(typeof(MeshFilter))]
 public class MeshGenerator : MonoBehaviour
 {
-
+    /*
     public static MeshGenerator Instance;
 
 
@@ -296,6 +296,62 @@ public class MeshGenerator : MonoBehaviour
         // UpdateMesh();
 
     }
+
+
+
+
+
+    */
+
+    /*
+
+    the class holds a way to spawn the object from the parts and all the comp added
+
+
+
+
+
+
+
+
+    there is class which holds the current parts part
+    and then copy what is being cut into it making it a part
+    for every cut or part,, this all depends i we want to do one cut at the time 
+
+    create the pplane and send it to a function with the part to cut
+    the function also takes the ddirection bool so we do up and down 
+    for call of the function create anew part var where the part is going to be stored
+
+    have the two rays
+
+    the thing is the script goes thgouht the material and shit like that but no need
+
+    then go through all the toiangles  in a loop +3
+
+    use the get side fro the plane to see where the original.vertices[i] is in relation to the plane
+
+    if all on one side then add it to the partmesh
+
+    dependoing on the one that its on its own start the the rays from there to the other ones
+    
+
+    so plane raycast does this (This function sets enter to the distance along the ray, where it intersects the plane.)
+    so that and out a point and then get a perc to then use a lerp fromt he dist 
+
+
+    and then there si something about adding edges?
+    there is this edges shit i dont get it i can just add the thing 
+
+    and then add the tirangles depening on how many were intersected 
+
+    end of loop
+
+
+     */
+
+
+
+
 
 
 

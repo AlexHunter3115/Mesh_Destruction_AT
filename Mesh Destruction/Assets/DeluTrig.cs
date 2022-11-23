@@ -64,20 +64,12 @@ public class DeluTrig : MonoBehaviour
         List<Vector3> verticesList = new List<Vector3>();
         List<int> trianglesList = new List<int>();
 
-
-        //verticesList.Add(vertex)
-
-
-
         Vector3 p1a = new Vector3(triangulation[3].edges[2].edge[0][0], 0, triangulation[3].edges[2].edge[0][1]);
         Vector3 p2a = new Vector3(triangulation[3].edges[1].edge[0][0], 0, triangulation[3].edges[1].edge[0][1]);
         Vector3 p3a = new Vector3(triangulation[3].edges[0].edge[0][0], 0, triangulation[3].edges[0].edge[0][1]);
         Vector3 p1b = new Vector3(triangulation[0].edges[2].edge[0][0], 0, triangulation[0].edges[2].edge[0][1]);
         Vector3 p2b = new Vector3(triangulation[0].edges[1].edge[0][0], 0, triangulation[0].edges[1].edge[0][1]);
         Vector3 p3b = new Vector3(triangulation[0].edges[0].edge[0][0], 0, triangulation[0].edges[0].edge[0][1]);
-
-
-
 
 
 
@@ -99,21 +91,16 @@ public class DeluTrig : MonoBehaviour
         }
 
 
-
-
         trianglesList.Add(0);
         trianglesList.Add(1);
         trianglesList.Add(2);
-
 
 
         trianglesList.Add(3);
         trianglesList.Add(4);
         trianglesList.Add(5);
 
-
         mesh.vertices = verticesList.ToArray();
-
 
         mesh.triangles = trianglesList.ToArray();
         mesh.RecalculateNormals();
