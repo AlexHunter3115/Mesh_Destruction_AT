@@ -25,7 +25,7 @@ public class note : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            //DestroyMesh();
+            DestroyMesh();
         }
 
         if (Input.GetMouseButtonDown(1))
@@ -94,15 +94,14 @@ public class note : MonoBehaviour
 
 
                 // i think i can do without it and just use the plane in scene
-                //var plane = new Plane(UnityEngine.Random.onUnitSphere, new Vector3(UnityEngine.Random.Range(bounds.min.x, bounds.max.x),
-                //                                                                   UnityEngine.Random.Range(bounds.min.y, bounds.max.y),
-                //                                                                   UnityEngine.Random.Range(bounds.min.z, bounds.max.z)));
 
-                Mesh planeMesh = planeCutter.transform.GetComponent<MeshFilter>().mesh;
+                //Mesh planeMesh = planeCutter.transform.GetComponent<MeshFilter>().mesh;
+                var plane = new Plane(UnityEngine.Random.onUnitSphere, new Vector3(UnityEngine.Random.Range(bounds.min.x, bounds.max.x),
+                                                                                  UnityEngine.Random.Range(bounds.min.y, bounds.max.y),
+                                                                                  UnityEngine.Random.Range(bounds.min.z, bounds.max.z)));
 
-                Plane plane = new Plane(planeCutter.transform.TransformPoint(planeMesh.vertices[0]),
-                                        planeCutter.transform.TransformPoint(planeMesh.vertices[110]),
-                                        planeCutter.transform.TransformPoint(planeMesh.vertices[120]) );
+
+
 
 
                 subParts.Add(GenerateMesh(parts[i], plane, true));
@@ -190,14 +189,23 @@ public class note : MonoBehaviour
 
                 //condition ? consequent : alternative
 
-                //cut points// i think this is tryint ot get the side from which the raycasts will come but this is awfull
+                //cut points// i think this is tryint ot get the side from which the raycasts will come but this is disgusting
+
+                //singleIndex = b == c ? 0 : a == c ? 1 : 2;
+
+                // is b == c  then returnt 0      if not then is a == c  yes return 1 else 2
+                //print(singleIndex);
+                // b == c expected   0     
+                // b != c    a == c   expected 1    
+                // b != c    a != c    expected 2    
+
                 var singleIndex    =       sideB ==    sideC ? 0 : sideA         ==     sideC ? 1 : 2;
 
                 // 
 
 
                 ray1.origin = original.Vertices[triangles[j + singleIndex]];
-
+                                        //            just an overload check                                   lone vertex
                 var dir1 = original.Vertices[triangles[j + ((singleIndex + 1) % 3)]] - original.Vertices[triangles[j + singleIndex]];
                 ray1.direction = dir1;   // simlpe dir setting 
 
@@ -226,7 +234,7 @@ public class note : MonoBehaviour
                         ray1.origin + ray1.direction.normalized * enter1,
                         ray2.origin + ray2.direction.normalized * enter2,
                         Vector2.Lerp(original.UV[triangles[j + singleIndex]], original.UV[triangles[j + ((singleIndex + 1) % 3)]], lerp1),
-                        Vector2.Lerp(original.UV[triangles[j + singleIndex]], original.UV[triangles[j + ((singleIndex + 2) % 3)]], lerp2));
+                        Vector2.Lerp(  original.UV[triangles[j + singleIndex]]   , original.UV[triangles[j + ((singleIndex + 2) % 3)]], lerp2));
 
 
 
@@ -238,9 +246,11 @@ public class note : MonoBehaviour
                                         original.Vertices[triangles[j + singleIndex]],
                                         ray1.origin + ray1.direction.normalized * enter1,
                                         ray2.origin + ray2.direction.normalized * enter2,
+
                                         original.Normals[triangles[j + singleIndex]],
                                         Vector3.Lerp(original.Normals[triangles[j + singleIndex]], original.Normals[triangles[j + ((singleIndex + 1) % 3)]], lerp1),
                                         Vector3.Lerp(original.Normals[triangles[j + singleIndex]], original.Normals[triangles[j + ((singleIndex + 2) % 3)]], lerp2),
+
                                         original.UV[triangles[j + singleIndex]],
                                         Vector2.Lerp(original.UV[triangles[j + singleIndex]], original.UV[triangles[j + ((singleIndex + 1) % 3)]], lerp1),
                                         Vector2.Lerp(original.UV[triangles[j + singleIndex]], original.UV[triangles[j + ((singleIndex + 2) % 3)]], lerp2));
@@ -254,9 +264,11 @@ public class note : MonoBehaviour
                                         ray1.origin + ray1.direction.normalized * enter1,
                                         original.Vertices[triangles[j + ((singleIndex + 1) % 3)]],
                                         original.Vertices[triangles[j + ((singleIndex + 2) % 3)]],
+
                                         Vector3.Lerp(original.Normals[triangles[j + singleIndex]], original.Normals[triangles[j + ((singleIndex + 1) % 3)]], lerp1),
                                         original.Normals[triangles[j + ((singleIndex + 1) % 3)]],
                                         original.Normals[triangles[j + ((singleIndex + 2) % 3)]],
+
                                         Vector2.Lerp(original.UV[triangles[j + singleIndex]], original.UV[triangles[j + ((singleIndex + 1) % 3)]], lerp1),
                                         original.UV[triangles[j + ((singleIndex + 1) % 3)]],
                                         original.UV[triangles[j + ((singleIndex + 2) % 3)]]);
@@ -268,9 +280,11 @@ public class note : MonoBehaviour
                                         ray1.origin + ray1.direction.normalized * enter1,
                                         original.Vertices[triangles[j + ((singleIndex + 2) % 3)]],
                                         ray2.origin + ray2.direction.normalized * enter2,
+
                                         Vector3.Lerp(original.Normals[triangles[j + singleIndex]], original.Normals[triangles[j + ((singleIndex + 1) % 3)]], lerp1),
                                         original.Normals[triangles[j + ((singleIndex + 2) % 3)]],
                                         Vector3.Lerp(original.Normals[triangles[j + singleIndex]], original.Normals[triangles[j + ((singleIndex + 2) % 3)]], lerp2),
+
                                         Vector2.Lerp(original.UV[triangles[j + singleIndex]], original.UV[triangles[j + ((singleIndex + 1) % 3)]], lerp1),
                                         original.UV[triangles[j + ((singleIndex + 2) % 3)]],
                                         Vector2.Lerp(original.UV[triangles[j + singleIndex]], original.UV[triangles[j + ((singleIndex + 2) % 3)]], lerp2));
@@ -397,6 +411,8 @@ public class note : MonoBehaviour
             mesh.vertices = Vertices;
             mesh.normals = Normals;
             mesh.uv = UV;
+
+           
             for (var i = 0; i < Triangles.Length; i++)
                 mesh.SetTriangles(Triangles[i], i, true);
             Bounds = mesh.bounds;

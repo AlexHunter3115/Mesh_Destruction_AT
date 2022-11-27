@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class DeluTrig : MonoBehaviour
 {
+
+    // this class was taken from my own Dissertation project
+
+
+
     [SerializeField]
     public List<Triangle> triangulation = new List<Triangle>();
 
@@ -39,15 +44,11 @@ public class DeluTrig : MonoBehaviour
 
         }
 
-
-
-
         if (call)
         {
             call = false;
             runtest();
         }
-
 
     }
 
@@ -72,7 +73,6 @@ public class DeluTrig : MonoBehaviour
         Vector3 p3b = new Vector3(triangulation[0].edges[0].edge[0][0], 0, triangulation[0].edges[0].edge[0][1]);
 
 
-
         verticesList.Add(p1a);
         verticesList.Add(p2a);
         verticesList.Add(p3a);
@@ -87,7 +87,7 @@ public class DeluTrig : MonoBehaviour
         foreach (var item in verticesList)
         {
             Debug.Log(item);
-            Instantiate(MeshGenerator.Instance.placeHolders, item, this.transform.rotation);
+            //Instantiate(MeshGenerator.Instance.placeHolders, item, this.transform.rotation);
         }
 
 
@@ -104,7 +104,7 @@ public class DeluTrig : MonoBehaviour
 
         mesh.triangles = trianglesList.ToArray();
         mesh.RecalculateNormals();
-        this.transform.GetComponent<MeshRenderer>().material = MeshGenerator.Instance.material;
+        //this.transform.GetComponent<MeshRenderer>().material = MeshGenerator.Instance.material;
     }
 
 
@@ -235,7 +235,6 @@ public class DeluTrig : MonoBehaviour
         public Vector2 c;
 
         public Edge[] edges = new Edge[3];
-
         public Triangle(Vector2 a, Vector2 b, Vector2 c)
         {
             this.a = a;

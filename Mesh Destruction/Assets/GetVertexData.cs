@@ -48,7 +48,7 @@ public class GetVertexData : MonoBehaviour
         //}
 
 
-        MeshGenerator.Instance.UpdateMesh(mesh);
+        //MeshGenerator.Instance.UpdateMesh(mesh);
 
 
     }
