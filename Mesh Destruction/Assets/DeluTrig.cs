@@ -128,7 +128,6 @@ public class DeluTrig : MonoBehaviour
     private void Start()
     {
 
-        mesh = this.transform.GetComponent<MeshFilter>().mesh;
 
         List<Vector2> pointList = new List<Vector2>();
 
@@ -155,11 +154,17 @@ public class DeluTrig : MonoBehaviour
         triangulation.Add(new Triangle(superTriangleA, superTriangleB, superTriangleC));
 
 
+
+
+        //for every point
         foreach (Vector2 point in pointList)
         {
 
             List<Triangle> badTriangles = new List<Triangle>();
 
+
+            //for every triangle   check fi the point we are going through right now is inside the circumwhateevr
+            // if it is that is a shit triangle 
             foreach (Triangle triangle in triangulation)
             {
                 if (IspointInCircumcircle(triangle.a, triangle.b, triangle.c, point))
@@ -171,18 +176,32 @@ public class DeluTrig : MonoBehaviour
 
             List<Edge> polygon = new List<Edge>();
 
+
+
+            //for a ll the bad triangles that need to basically be changed
             foreach (Triangle triangle in badTriangles)
             {
+
+                // get each edge of the tri
                 foreach (Edge triangleEdge in triangle.edges)
                 {
-                    bool isShared = false;
 
+
+                    bool isShared = false;
+                    //loop each edge against the other tri
                     foreach (Triangle otherTri in badTriangles)
-                    {
+                    { 
+
+                        // not it self
                         if (otherTri == triangle) { continue; }
 
+
+                        // for each edge in the other tri
                         foreach (Edge otherEdge in otherTri.edges)
                         {
+
+
+                            // is this the same edge 
                             if (LineIsEqual(triangleEdge, otherEdge))
                             {
                                 isShared = true;
@@ -195,7 +214,6 @@ public class DeluTrig : MonoBehaviour
                     {
                         polygon.Add(triangleEdge);
                     }
-
                 }
             }
 

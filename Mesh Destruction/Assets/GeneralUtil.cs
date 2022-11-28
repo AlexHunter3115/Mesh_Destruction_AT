@@ -16,14 +16,14 @@ public static class GeneralUtil
         List<Vector2> pointList = new List<Vector2>();
 
 
-        if (direction) 
+        if (direction)
         {
             foreach (var passedPoint in pointListRef)
             {
                 pointList.Add(new Vector2(passedPoint.x, passedPoint.y));
             }
         }
-        else 
+        else
         {
             foreach (var passedPoint in pointListRef)
             {
@@ -33,95 +33,95 @@ public static class GeneralUtil
 
 
 
-         List<Triangle> triangulation = new List<Triangle>();
+        List<Triangle> triangulation = new List<Triangle>();
 
-            Vector3 superTriangleA = new Vector3(10000, 10000, 10000);
-            Vector3 superTriangleB = new Vector3(10000, 0, 10000);
-            Vector3 superTriangleC = new Vector3(0, 10000, 10000);
+        Vector3 superTriangleA = new Vector3(10000, 10000, 10000);
+        Vector3 superTriangleB = new Vector3(10000, 0, 10000);
+        Vector3 superTriangleC = new Vector3(0, 10000, 10000);
 
-            triangulation.Add(new Triangle(superTriangleA, superTriangleB, superTriangleC));
+        triangulation.Add(new Triangle(superTriangleA, superTriangleB, superTriangleC));
 
 
-            foreach (Vector3 point in pointList)
+        foreach (Vector3 point in pointList)
+        {
+
+            List<Triangle> badTriangles = new List<Triangle>();
+
+            foreach (Triangle triangle in triangulation)
             {
-
-                List<Triangle> badTriangles = new List<Triangle>();
-
-                foreach (Triangle triangle in triangulation)
+                if (IspointInCircumcircle(triangle.a, triangle.b, triangle.c, point))
                 {
-                    if (IspointInCircumcircle(triangle.a, triangle.b, triangle.c, point))
-                    {
-                        badTriangles.Add(triangle);
-                    }
+                    badTriangles.Add(triangle);
                 }
+            }
 
 
 
 
 
-                List<Edge> polygon = new List<Edge>();
+            List<Edge> polygon = new List<Edge>();
 
-                foreach (Triangle triangle in badTriangles)
+            foreach (Triangle triangle in badTriangles)
+            {
+                foreach (Edge triangleEdge in triangle.edges)
                 {
-                    foreach (Edge triangleEdge in triangle.edges)
+                    bool isShared = false;
+
+                    foreach (Triangle otherTri in badTriangles)
                     {
-                        bool isShared = false;
+                        if (otherTri == triangle) { continue; }
 
-                        foreach (Triangle otherTri in badTriangles)
+                        foreach (Edge otherEdge in otherTri.edges)
                         {
-                            if (otherTri == triangle) { continue; }
-
-                            foreach (Edge otherEdge in otherTri.edges)
+                            if (LineIsEqual(triangleEdge, otherEdge))
                             {
-                                if (LineIsEqual(triangleEdge, otherEdge))
-                                {
-                                    isShared = true;
-                                }
+                                isShared = true;
                             }
-
-
-
                         }
 
-                        if (isShared == false)
-                        {
-                            polygon.Add(triangleEdge);
-                        }
+
 
                     }
+
+                    if (isShared == false)
+                    {
+                        polygon.Add(triangleEdge);
+                    }
+
                 }
-
-
-                foreach (Triangle badTriangle in badTriangles)
-                {
-                    triangulation.Remove(badTriangle);   // i think this is the issue here
-                }
-
-                foreach (Edge edge in polygon)
-                {
-                    Triangle newTriangle = new Triangle(edge.edge[0], edge.edge[1], point);
-                    triangulation.Add(newTriangle);
-                }
-
             }
 
 
-
-            for (int i = triangulation.Count - 1; i >= 0; i--)
+            foreach (Triangle badTriangle in badTriangles)
             {
-                if (triangulation[i].HasVertex(superTriangleA) || triangulation[i].HasVertex(superTriangleB) || triangulation[i].HasVertex(superTriangleC))
-                {
-                    triangulation.Remove(triangulation[i]);
-                }
-
+                triangulation.Remove(badTriangle);   // i think this is the issue here
             }
 
-
-
-
-            return triangulation;
+            foreach (Edge edge in polygon)
+            {
+                Triangle newTriangle = new Triangle(edge.edge[0], edge.edge[1], point);
+                triangulation.Add(newTriangle);
+            }
 
         }
+
+
+
+        for (int i = triangulation.Count - 1; i >= 0; i--)
+        {
+            if (triangulation[i].HasVertex(superTriangleA) || triangulation[i].HasVertex(superTriangleB) || triangulation[i].HasVertex(superTriangleC))
+            {
+                triangulation.Remove(triangulation[i]);
+            }
+
+        }
+
+
+
+
+        return triangulation;
+
+    }
 
 
     public class Triangle
