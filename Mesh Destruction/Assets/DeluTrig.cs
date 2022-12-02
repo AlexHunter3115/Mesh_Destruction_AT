@@ -199,12 +199,21 @@ public class DeluTrig : MonoBehaviour
                         // for each edge in the other tri
                         foreach (Edge otherEdge in otherTri.edges)
                         {
-
+                            bool test = false;
 
                             // is this the same edge 
                             if (LineIsEqual(triangleEdge, otherEdge))
                             {
                                 isShared = true;
+                                test = true;
+                                break;
+                            }
+
+
+
+                            if (test) 
+                            {
+                                break;
                             }
                         }
 

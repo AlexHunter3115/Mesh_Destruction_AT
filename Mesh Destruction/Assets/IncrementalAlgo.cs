@@ -11,17 +11,17 @@ public class IncrementalAlgo : MonoBehaviour
 
 
     public List<Vector3> points = new List<Vector3>();
-
+    public List<Vector3> pointsTest = new List<Vector3>();
+    public Material mat;
     public List<tetraDeluTrig.Triangle> triangles = new List<tetraDeluTrig.Triangle>();
 
 
     public bool test = false;
+    public bool type = false;
     
     void Start()
     {
-
         RunIterationAlgo();
-
     }
 
 
@@ -36,15 +36,14 @@ public class IncrementalAlgo : MonoBehaviour
 
 
         points.Clear();
+        triangles.Clear();
 
-        for (int i = 0; i < 30; i++)
-        {
-            points.Add(new Vector3(Random.Range(-15, 15), Random.Range(-15, 15), Random.Range(-15, 15)));
-        }
+        //for (int i = 0; i < 30; i++)
+        //{
+        //    points.Add(new Vector3(Random.Range(-15, 15), Random.Range(-15, 15), Random.Range(-15, 15)));
+        //}
 
-
-
-
+        points = pointsTest;
 
 
         List<int> triangleIndex = new List<int>();
@@ -75,7 +74,7 @@ public class IncrementalAlgo : MonoBehaviour
 
         while (points.Count > 1)
         {
-            if (iter > 40)
+            if (iter > 100)
             {
                 Debug.Log($"exit on the iter");
                 destroy = true;
@@ -118,12 +117,8 @@ public class IncrementalAlgo : MonoBehaviour
                 }
             }
 
-
-            Debug.Log(points.Count);
             randomIndex = Random.Range(0, points.Count);
-            Debug.Log(randomIndex);
-
-            Debug.Log("-==-==========================");
+         
             List<int> interestedTris = new List<int>();
 
 
@@ -140,7 +135,6 @@ public class IncrementalAlgo : MonoBehaviour
 
             interestedTris.Sort();
             interestedTris.Reverse();
-            Debug.Log(interestedTris.Count);
 
             List<tetraDeluTrig.Edge> interestedEdges = new List<tetraDeluTrig.Edge>();
             List<tetraDeluTrig.Triangle> rejectedTrigs = new List<tetraDeluTrig.Triangle>();
@@ -163,9 +157,6 @@ public class IncrementalAlgo : MonoBehaviour
                     allEdges.Add(tri.edges[1]);
                     allEdges.Add(tri.edges[2]);
                 }
-
-
-                Debug.Log(allEdges.Count);
 
                 for (int i = 0; i < allEdges.Count; i++)
                 {
@@ -206,19 +197,20 @@ public class IncrementalAlgo : MonoBehaviour
 
                 foreach (var idx in delInt)
                 {
-                    allEdges.RemoveAt(idx);
+                    if (idx >= allEdges.Count) { }
+                    else 
+                    {
+                        allEdges.RemoveAt(idx);
+                    }
                 }
-
 
                 foreach (var edges in allEdges)
                 {
                     triangles.Add(new tetraDeluTrig.Triangle(edges.edge[0], edges.edge[1], points[randomIndex]));
                 }
-
             }
             else
             {
-
                 foreach (var edges in rejectedTrigs[0].edges)
                 {
                     triangles.Add(new tetraDeluTrig.Triangle(edges.edge[0], edges.edge[1], points[randomIndex]));
@@ -249,15 +241,12 @@ public class IncrementalAlgo : MonoBehaviour
 
         mesh.vertices = vertex.ToArray();
         mesh.triangles = triangleIndex.ToArray();
+        mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
+        mesh.RecalculateTangents();
 
-
-
-
-
-
-
-
-        
+        this.GetComponent<MeshRenderer>().material = mat;
+        points.Clear();
 
     }
 
@@ -300,13 +289,13 @@ public class IncrementalAlgo : MonoBehaviour
         }
 
 
-        foreach (var tri in triangles)
-        {
-            foreach (var edge in tri.edges)
-            {
-                Debug.DrawLine(edge.edge[0], edge.edge[1], Color.red);
-            }
-        }
+        //foreach (var tri in triangles)
+        //{
+        //    foreach (var edge in tri.edges)
+        //    {
+        //        //Debug.DrawLine(edge.edge[0], edge.edge[1], Color.red);
+        //    }
+        //}
     }
 
 }
