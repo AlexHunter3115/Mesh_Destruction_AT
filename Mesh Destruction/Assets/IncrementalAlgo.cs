@@ -17,7 +17,7 @@ public class IncrementalAlgo : MonoBehaviour
 
 
     public bool test = false;
-    public bool type = false;
+   // public bool type = false;
     
     void Start()
     {
@@ -38,12 +38,24 @@ public class IncrementalAlgo : MonoBehaviour
         points.Clear();
         triangles.Clear();
 
-        //for (int i = 0; i < 30; i++)
-        //{
-        //    points.Add(new Vector3(Random.Range(-15, 15), Random.Range(-15, 15), Random.Range(-15, 15)));
-        //}
+
+
+
+        if (test)
+        {
+            points = pointsTest;
+        }
+        else 
+        {
+            for (int i = 0; i < 30; i++)
+            {
+                points.Add(new Vector3(Random.Range(-15, 15), Random.Range(-15, 15), Random.Range(-15, 15)));
+            }
+        }
+
 
         points = pointsTest;
+
 
 
         List<int> triangleIndex = new List<int>();
@@ -282,11 +294,11 @@ public class IncrementalAlgo : MonoBehaviour
     {
 
 
-        if (test) 
-        {
-            test = false;
-            RunIterationAlgo();
-        }
+        //if (test) 
+        //{
+        //    test = false;
+        //    RunIterationAlgo();
+        //}
 
 
         //foreach (var tri in triangles)
