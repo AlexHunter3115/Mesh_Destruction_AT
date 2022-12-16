@@ -39,4 +39,25 @@ what if you do go thoruohg every edge so create triangle go thgouth edge one, ed
 
 https://drive.google.com/file/d/1O0d_pqitpgbFYJG06JO6uAJjudI-QHwn/view       https://forum.unity.com/threads/3d-math-functions.126575/      https://math.stackexchange.com/questions/1875452/calculate-circumsphere-of-tetrahedron
 
+
+
+ ----------------------------------  TO DO  ----------------------------------
+
+
+spawn the created fragment using convex hull
+
+find a nice asset pack
+
+create the wall, right now its one layer, we need two
+
+Also there is the issue that the vertecies are not spawning in the right place, should just be an issue with the world pos
+
+do the 4 wall setup
+
+
+Game idea - i was thinking zombies tbh, the zombies walk to the window, break it
+
+window can be repaired, if each "wall" holds a que of a list of vectors then i can just call the vectors from the latets destoyed and replenish them
+
+
  */

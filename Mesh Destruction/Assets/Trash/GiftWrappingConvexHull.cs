@@ -8,7 +8,7 @@ using UnityEditor;
 
 
 
-public class ConvexHull : MonoBehaviour
+public class GiftWrappingConvexHull : MonoBehaviour
 {
     /*
      * get 3 points that share the same plane 

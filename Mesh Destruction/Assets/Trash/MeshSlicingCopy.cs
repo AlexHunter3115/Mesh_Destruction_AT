@@ -1,4 +1,4 @@
-using static note;
+using static MeshSlicingCopy;
 using static UnityEngine.UI.Image;
 using System.Collections.Generic;
 using System;
@@ -7,7 +7,7 @@ using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine.UIElements;
 using UnityEngine;
 
-public class note : MonoBehaviour
+public class MeshSlicingCopy : MonoBehaviour
 {
     private bool edgeSet = false;
     private Vector3 edgeVertex = Vector3.zero;
@@ -398,7 +398,7 @@ public class note : MonoBehaviour
                 Triangles[i] = _Triangles[i].ToArray();
         }
 
-        public void MakeGameobject(note original)
+        public void MakeGameobject(MeshSlicingCopy original)
         {
             GameObject = new GameObject(original.name);
             GameObject.transform.position = original.transform.position;
@@ -427,7 +427,7 @@ public class note : MonoBehaviour
             collider.convex = true;
 
             var rigidbody = GameObject.AddComponent<Rigidbody>();
-            var meshDestroy = GameObject.AddComponent<note>();
+            var meshDestroy = GameObject.AddComponent<MeshSlicingCopy>();
             meshDestroy.CutCascades = original.CutCascades;
             meshDestroy.ExplodeForce = original.ExplodeForce;
             meshDestroy.planeCutter = original.planeCutter;
