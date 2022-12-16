@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -16,8 +17,9 @@ public class MarchingSquare : MonoBehaviour
     public Vector3[,] verticesStatic = new Vector3[0, 0];
     MarchingSquarePoint[,] marchingPoints = new MarchingSquarePoint[0,0];
 
-    MarchingSquarePoint[,] marchingPointsFlood = new MarchingSquarePoint[0,0];
+    MarchingSquarePoint[][] marchingPointsFlood = new MarchingSquarePoint[0][];
 
+    List<MarchingSquarePoint> floodListMarching = new List<MarchingSquarePoint>();
     
 
 
@@ -84,7 +86,7 @@ public class MarchingSquare : MonoBehaviour
                 for (int x = 0; x < verticesStatic.GetLength(1); x++)
                 {
 
-                        marchingPoints[y, x] = new MarchingSquarePoint(verticesStatic[y, x], true, 1);
+                        marchingPoints[y, x] = new MarchingSquarePoint(verticesStatic[y, x], true, 1, new Vector2Int(x,y));
 
                     
                 }
@@ -124,16 +126,12 @@ public class MarchingSquare : MonoBehaviour
             {
                 if (Vector3.Distance(intersectionPoint,point.position) <= dist) 
                 {
-                    Debug.Log("----------");
-                    Debug.Log(point.weigth);
-
-
                     point.weigth -= Mathf.Pow(2, -(Vector3.Distance(intersectionPoint, point.position))-0.5f);
-                    Debug.Log(Vector3.Distance(intersectionPoint, point.position));
-                    Debug.Log(point.weigth);
                 }
             }
             CallMarch();
+            FloodFillSetup();
+            
         }
        
     }
@@ -147,15 +145,113 @@ public class MarchingSquare : MonoBehaviour
 
     private void FloodFillSetup() 
     {
-        
-    
+        foreach (var point in marchingPoints)
+        {
+            point.state = false;
+        }
+
+        int iter = 0;
+
+        List<Vector2Int> coords = new List<Vector2Int>();
+       
+        while (true) 
+        {
+            //false means its not been added
+
+            coords.Clear();
+
+
+            floodListMarching.Clear();
+            if (iter > 10) 
+            {
+                break;
+            }
+
+
+
+            bool done = true;
+
+            foreach (var point in marchingPoints)
+            {
+                if (!point.state && point.weigth >= 0.3f)
+                {
+                    done = false;
+                    break;
+                }
+            }
+
+
+            if (done)
+                break;
+
+            foreach (var point in marchingPoints)
+            {
+                if (point.weigth >= 0.3f && !point.state) // so its visible
+                { 
+                    coords.Add(point.idx);
+                }
+            }
+
+            var wantedCoord = coords[Random.Range(0, coords.Count)];  //pick a random coord from the choosen ones
+            FloodCall(wantedCoord.x, wantedCoord.y);
+
+            if (floodListMarching.Count > 1) 
+            {
+                bool toDel = true;
+
+
+                foreach (var point in floodListMarching)
+                {
+                    if (point.idx.x == 0  || point.idx.y == 0 || point.idx.x == marchingPoints.GetLength(1)-1 || point.idx.y == marchingPoints.GetLength(0) - 1) 
+                    {
+                        toDel = false;
+                        break;
+                    }
+                }
+
+
+                if (toDel) 
+                {
+                    foreach (var point in floodListMarching)
+                    {
+                        point.weigth = 0;
+                    }
+
+                    //call a fucntion here to take the vertex and create an obj the floodlist has all the vertecies
+                    CallMarch();    // this prob can be put somewhere else so its doesnt call all the time
+                }
+            }
+            
+
+            iter++;
+        }
     }
 
 
 
 
 
+    private void FloodCall(int x, int y) 
+    {
 
+        if (y >= 0 && x >= 0 && y < marchingPoints.GetLength(0) && x < marchingPoints.GetLength(1))
+        {
+
+            //Debug.Log($"{marchingPoints[y, x].state} and {marchingPoints[y, x].weigth}  for  {x} and {y}");
+            if (!marchingPoints[y,x].state && marchingPoints[y,x].weigth >= 0.3f)
+            {
+                //Debug.Log($"{x} and {y} are in hereiurewieriureiuoeriou");
+                marchingPoints[y, x].state = true;
+
+                floodListMarching.Add(marchingPoints[y, x]);
+
+                FloodCall(x + 1, y);
+                FloodCall(x - 1, y);
+                FloodCall(x, y + 1);
+                FloodCall(x, y - 1);
+            }
+        }
+    }
 
 
 
@@ -206,8 +302,6 @@ public class MarchingSquare : MonoBehaviour
             }
         }
 
-        Debug.Log(verticesList.Count);
-        Debug.Log(trianglesList.Count);
 
         mesh.vertices = verticesList.ToArray();
         mesh.triangles = trianglesList.ToArray();
@@ -454,7 +548,7 @@ public class MarchingSquare : MonoBehaviour
         {
             foreach (var vertex in verticesStatic)
             {
-                Gizmos.DrawSphere(vertex, 0.1f);
+                Gizmos.DrawSphere(vertex, 0.01f);
             }
         }
 
@@ -470,12 +564,27 @@ public class MarchingSquarePoint
     public Vector3 position;
     public bool state;
     public float weigth;
+    public Vector2Int idx;
 
 
-    public MarchingSquarePoint(Vector3 _position, bool _state,float _weight)
+    public MarchingSquarePoint(Vector3 _position, bool _state,float _weight, Vector2Int _idx)
     {
         this.position = _position;
-        this.state = _state;
+        this.state = false;
         this.weigth = _weight;
+        this.idx = _idx;
+    }
+}
+
+
+
+
+public class MarchingFlood : MarchingSquarePoint
+{
+    
+
+    public MarchingFlood(Vector3 _position, bool _state, float _weight, Vector2Int _idx) : base(_position, _state, _weight, _idx)
+    {
+
     }
 }

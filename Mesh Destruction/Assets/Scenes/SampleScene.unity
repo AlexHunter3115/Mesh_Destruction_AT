@@ -575,7 +575,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84828ea6fc0fd99428838738a815c0b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resolutionX: 100
+  resolutionX: 40
   resolutionY: 40
   reload: 0
   genMarch: 0
