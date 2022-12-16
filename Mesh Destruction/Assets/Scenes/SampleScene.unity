@@ -575,7 +575,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84828ea6fc0fd99428838738a815c0b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resolutionX: 120
+  resolutionX: 100
   resolutionY: 40
   reload: 0
   genMarch: 0
@@ -585,7 +585,7 @@ MonoBehaviour:
   botLeft: {fileID: 2062737565}
   mat: {fileID: 2100000, guid: 180a2a1a2ffebed4a9dc3f38592a45f6, type: 2}
   disableGizmos: 0
-  dist: 0.1
+  dist: 0.3
 --- !u!33 &854852432
 MeshFilter:
   m_ObjectHideFlags: 0

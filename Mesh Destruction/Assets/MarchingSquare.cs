@@ -16,6 +16,9 @@ public class MarchingSquare : MonoBehaviour
     public Vector3[,] verticesStatic = new Vector3[0, 0];
     MarchingSquarePoint[,] marchingPoints = new MarchingSquarePoint[0,0];
 
+    MarchingSquarePoint[,] marchingPointsFlood = new MarchingSquarePoint[0,0];
+
+    
 
 
     public bool reload;
@@ -76,8 +79,6 @@ public class MarchingSquare : MonoBehaviour
 
             marchingPoints = new MarchingSquarePoint[resolutionY + 1, resolutionX + 1];
 
-
-
             for (int y = 0; y < verticesStatic.GetLength(0); y++)
             {
                 for (int x = 0; x < verticesStatic.GetLength(1); x++)
@@ -123,13 +124,45 @@ public class MarchingSquare : MonoBehaviour
             {
                 if (Vector3.Distance(intersectionPoint,point.position) <= dist) 
                 {
-                    point.weigth -= (1 / Mathf.Pow(Vector3.Distance(intersectionPoint, point.position), 2)) / 2;
+                    Debug.Log("----------");
+                    Debug.Log(point.weigth);
+
+
+                    point.weigth -= Mathf.Pow(2, -(Vector3.Distance(intersectionPoint, point.position))-0.5f);
+                    Debug.Log(Vector3.Distance(intersectionPoint, point.position));
+                    Debug.Log(point.weigth);
                 }
             }
             CallMarch();
         }
        
     }
+
+
+
+
+
+
+
+
+    private void FloodFillSetup() 
+    {
+        
+    
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
