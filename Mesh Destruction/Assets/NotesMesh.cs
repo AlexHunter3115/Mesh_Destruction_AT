@@ -50,8 +50,6 @@ find a nice asset pack
 
 create the wall, right now its one layer, we need two
 
-Also there is the issue that the vertecies are not spawning in the right place, should just be an issue with the world pos
-
 do the 4 wall setup
 
 

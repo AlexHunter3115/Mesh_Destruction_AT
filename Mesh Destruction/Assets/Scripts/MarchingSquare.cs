@@ -26,6 +26,8 @@ public class MarchingSquare : MonoBehaviour
     public bool reload;
     public bool genMarch;
 
+    
+
     public GameObject topLeft;
     public GameObject topRight;
     public GameObject botRight;
@@ -52,10 +54,10 @@ public class MarchingSquare : MonoBehaviour
         {
             reload = false;
 
-            Vector3 topLeftPos = topLeft.transform.position;
-            Vector3 topRightPos = topRight.transform.position;
-            Vector3 botLeftPos = botLeft.transform.position;
-            Vector3 botRightPos = botRight.transform.position;
+            Vector3 topLeftPos = topLeft.transform.localPosition;   //loc
+            Vector3 topRightPos = topRight.transform.localPosition;
+            Vector3 botLeftPos = botLeft.transform.localPosition;
+            Vector3 botRightPos = botRight.transform.localPosition;
 
             verticesStatic = new Vector3[resolutionY + 1, resolutionX + 1];
 
@@ -85,10 +87,7 @@ public class MarchingSquare : MonoBehaviour
             {
                 for (int x = 0; x < verticesStatic.GetLength(1); x++)
                 {
-
-                        marchingPoints[y, x] = new MarchingSquarePoint(verticesStatic[y, x], true, 1, new Vector2Int(x,y));
-
-                    
+                     marchingPoints[y, x] = new MarchingSquarePoint(verticesStatic[y, x], true, 1, new Vector2Int(x,y));
                 }
             }
 
@@ -143,6 +142,8 @@ public class MarchingSquare : MonoBehaviour
 
 
 
+
+
     private void FloodFillSetup() 
     {
         foreach (var point in marchingPoints)
@@ -160,14 +161,11 @@ public class MarchingSquare : MonoBehaviour
 
             coords.Clear();
 
-
             floodListMarching.Clear();
             if (iter > 10) 
             {
                 break;
             }
-
-
 
             bool done = true;
 
@@ -179,7 +177,6 @@ public class MarchingSquare : MonoBehaviour
                     break;
                 }
             }
-
 
             if (done)
                 break;
@@ -198,7 +195,6 @@ public class MarchingSquare : MonoBehaviour
             if (floodListMarching.Count > 1) 
             {
                 bool toDel = true;
-
 
                 foreach (var point in floodListMarching)
                 {
@@ -222,7 +218,6 @@ public class MarchingSquare : MonoBehaviour
                 }
             }
             
-
             iter++;
         }
     }
@@ -300,6 +295,15 @@ public class MarchingSquare : MonoBehaviour
                     verticesList.Add(addingList[i]);
                 }
             }
+        }
+
+        Debug.Log(verticesList[0]);
+
+
+        Debug.Log(verticesList.Count);
+        if (verticesList.Count > 65000)
+        {
+            mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         }
 
 
