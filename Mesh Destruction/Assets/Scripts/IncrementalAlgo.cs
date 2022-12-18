@@ -11,7 +11,6 @@ public class IncrementalAlgo : MonoBehaviour
 
 
     public List<Vector3> points = new List<Vector3>();
-    public List<Vector3> pointsTest = new List<Vector3>();
     public Material mat;
     public List<tetraDeluTrig.Triangle> triangles = new List<tetraDeluTrig.Triangle>();
 
@@ -40,32 +39,31 @@ public class IncrementalAlgo : MonoBehaviour
 
 
 
-
-        if (test)
-        {
-            points = pointsTest;
-        }
-        else 
-        {
             for (int i = 0; i < 30; i++)
             {
                 points.Add(new Vector3(Random.Range(-15, 15), Random.Range(-15, 15), Random.Range(-15, 15)));
             }
-        }
+        
 
 
-        points = pointsTest;
 
 
+        var results = GeneralUtil.IncrementalConvex(points);
+
+
+
+        Mesh mesh = GetComponent<MeshFilter>().mesh;
+
+        mesh.Clear();
+
+
+        /*
 
         List<int> triangleIndex = new List<int>();
 
         List<Vector3> vertex = new List<Vector3>();
 
 
-        Mesh mesh = GetComponent<MeshFilter>().mesh;
-
-        mesh.Clear();
 
 
         triangles.Add(new tetraDeluTrig.Triangle(points[0], points[1], points[2]));
@@ -249,10 +247,11 @@ public class IncrementalAlgo : MonoBehaviour
             triangleIndex.Add(vertex.Count);
             vertex.Add(tri.c);
         }
+        */
 
 
-        mesh.vertices = vertex.ToArray();
-        mesh.triangles = triangleIndex.ToArray();
+        mesh.vertices = results.Item1.ToArray();
+        mesh.triangles = results.Item2.ToArray();
         mesh.RecalculateBounds();
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();

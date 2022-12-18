@@ -216,6 +216,222 @@ public static class GeneralUtil
         else { return false; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="points"></param>
+    /// <returns>first is the vertices then the tringles index</returns>
+    public static Tuple<List<Vector3>, List<int>> IncrementalConvex(List<Vector3> points) 
+    {
+        var vertecies = new List<Vector3>();
+        var triangle = new List<int>();
+
+       var triangles = new List<Triangle>();
+
+
+
+
+
+
+
+
+
+        triangles.Add(new Triangle(points[0], points[1], points[2]));
+        triangles.Add(new Triangle(points[3], points[2], points[1]));
+        triangles.Add(new Triangle(points[0], points[2], points[3]));
+        triangles.Add(new Triangle(points[1], points[0], points[3]));
+
+
+        points.RemoveAt(0);
+        points.RemoveAt(0);
+        points.RemoveAt(0);
+        points.RemoveAt(0);
+
+
+        int iter = 0;
+        bool destroy = false;
+
+
+        while (points.Count > 1)
+        {
+            if (iter > 100)
+            {
+                Debug.Log($"exit on the iter");
+                destroy = true;
+                break;
+            }
+            iter++;
+
+
+
+
+            int randomIndex = 0;
+
+            for (int i = points.Count; i-- > 0;)
+            {
+
+
+                bool insideHull = false;
+                foreach (var tri in triangles)
+                {
+                    Plane plane = new Plane(tri.a, tri.b, tri.c);
+
+                    if (plane.GetSide(points[i]))   //outside
+                    {
+                        insideHull = true;
+                        break;
+                    }
+                    else   //inside
+                    {
+
+                    }
+                }
+
+                if (!insideHull)
+                {
+                    points.RemoveAt(i);
+                }
+                else
+                {
+
+                }
+            }
+
+            randomIndex = Random.Range(0, points.Count);
+
+            List<int> interestedTris = new List<int>();
+
+
+
+            for (int i = 0; i < triangles.Count; i++)
+            {
+                Plane plane = new Plane(triangles[i].a, triangles[i].b, triangles[i].c);
+
+                if (plane.GetSide(points[randomIndex]))
+                {
+                    interestedTris.Add(i);
+                }
+            }
+
+            interestedTris.Sort();
+            interestedTris.Reverse();
+
+            List<Edge> interestedEdges = new List<Edge>();
+            List<Triangle> rejectedTrigs = new List<Triangle>();
+
+            foreach (var removeIdx in interestedTris)
+            {
+                rejectedTrigs.Add(triangles[removeIdx]);
+                triangles.RemoveAt(removeIdx);
+            }
+
+            if (rejectedTrigs.Count > 1)
+            {
+                List<Edge> allEdges = new List<Edge>();
+                List<int> delInt = new List<int>();
+
+
+                foreach (var tri in rejectedTrigs)   // this adds all the possible angles
+                {
+                    allEdges.Add(tri.edges[0]);
+                    allEdges.Add(tri.edges[1]);
+                    allEdges.Add(tri.edges[2]);
+                }
+
+                for (int i = 0; i < allEdges.Count; i++)
+                {
+                    bool same = false;
+                    int sameIDX = 0;
+                    for (int j = 0; j < allEdges.Count; j++)
+                    {
+
+                        if (i == j)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            if (LineIsEqual(allEdges[i], allEdges[j]))
+                            {// the should techincally only be one
+                                same = true;
+                                sameIDX = j;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (same)
+                    {
+                        if (!delInt.Contains(i))
+                        {
+
+                            delInt.Add(i);
+                            delInt.Add(sameIDX);
+                        }
+                    }
+                }
+
+
+                delInt.Sort();
+                delInt.Reverse();
+
+                foreach (var idx in delInt)
+                {
+                    if (idx >= allEdges.Count) { }
+                    else
+                    {
+                        allEdges.RemoveAt(idx);
+                    }
+                }
+
+                foreach (var edges in allEdges)
+                {
+                    triangles.Add(new Triangle(edges.edge[0], edges.edge[1], points[randomIndex]));
+                }
+            }
+            else
+            {
+                foreach (var edges in rejectedTrigs[0].edges)
+                {
+                    triangles.Add(new Triangle(edges.edge[0], edges.edge[1], points[randomIndex]));
+                }
+            }
+        }
+
+
+
+
+        if (destroy)
+        {
+            Debug.Log("<color=red> This iter did not work </color>");
+        }
+
+        foreach (var tri in triangles)
+        {
+            triangle.Add(vertecies.Count);
+            vertecies.Add(tri.a);
+            triangle.Add(vertecies.Count);
+            vertecies.Add(tri.b);
+            triangle.Add(vertecies.Count);
+            vertecies.Add(tri.c);
+        }
+
+
+
+
+
+
+
+
+
+
+        return Tuple.Create(vertecies, triangle);
+    
+    
+    
+    }
+
+
 
 
     #region ToDel

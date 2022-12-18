@@ -685,7 +685,7 @@ public class tetraDeluTrig : MonoBehaviour
 
 
     }
-
+    
     public class Triangle
     {
 
@@ -713,6 +713,8 @@ public class tetraDeluTrig : MonoBehaviour
         
 
     }
+
+    
     public class Edge
     {
         public Vector3[] edge = new Vector3[2];

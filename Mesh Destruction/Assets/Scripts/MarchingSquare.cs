@@ -17,8 +17,6 @@ public class MarchingSquare : MonoBehaviour
     public Vector3[,] verticesStatic = new Vector3[0, 0];
     MarchingSquarePoint[,] marchingPoints = new MarchingSquarePoint[0,0];
 
-    MarchingSquarePoint[][] marchingPointsFlood = new MarchingSquarePoint[0][];
-
     List<MarchingSquarePoint> floodListMarching = new List<MarchingSquarePoint>();
     
 
@@ -105,10 +103,23 @@ public class MarchingSquare : MonoBehaviour
     }
 
 
+    public void ImpactReceiver(Vector3 impactPoint) 
+    {
+        foreach (var point in marchingPoints)
+        {
+            if (Vector3.Distance(impactPoint,transform.position + point.position) <= dist)
+            {
+                point.weigth -= Mathf.Pow(2, -(Vector3.Distance(impactPoint, transform.position + point.position)) - 0.5f);
+            }
+        }
+        CallMarch();
+        FloodFillSetup();
+    }
 
+    /*
     void OnMouseDown()
     {
-
+        Debug.Log("nefjijieijeije");
         Ray ray = new Ray();
         RaycastHit hit;
 
@@ -120,12 +131,13 @@ public class MarchingSquare : MonoBehaviour
         if (Physics.Raycast(ray, out hit))
         {
             Vector3 intersectionPoint = hit.point;
-
+            Debug.Log("call for hit");
             foreach (var point in marchingPoints)
             {
-                if (Vector3.Distance(intersectionPoint,point.position) <= dist) 
+                
+                if (Vector3.Distance(intersectionPoint,transform.position +point.position) <= dist) 
                 {
-                    point.weigth -= Mathf.Pow(2, -(Vector3.Distance(intersectionPoint, point.position))-0.5f);
+                    point.weigth -= Mathf.Pow(2, -(Vector3.Distance(intersectionPoint,transform.position+ point.position))-0.5f);
                 }
             }
             CallMarch();
@@ -136,13 +148,7 @@ public class MarchingSquare : MonoBehaviour
     }
 
 
-
-
-
-
-
-
-
+    */
 
     private void FloodFillSetup() 
     {
@@ -151,7 +157,6 @@ public class MarchingSquare : MonoBehaviour
             point.state = false;
         }
 
-        int iter = 0;
 
         List<Vector2Int> coords = new List<Vector2Int>();
        
@@ -161,11 +166,7 @@ public class MarchingSquare : MonoBehaviour
 
             coords.Clear();
 
-            floodListMarching.Clear();
-            if (iter > 10) 
-            {
-                break;
-            }
+            
 
             bool done = true;
 
@@ -218,7 +219,6 @@ public class MarchingSquare : MonoBehaviour
                 }
             }
             
-            iter++;
         }
     }
 
@@ -249,14 +249,9 @@ public class MarchingSquare : MonoBehaviour
     }
 
 
-
-
-
-
-
-
-
-
+    /// <summary>
+    /// this calls for the re-creation of the whole wall
+    /// </summary>
     private void CallMarch() 
     {
 
@@ -297,15 +292,11 @@ public class MarchingSquare : MonoBehaviour
             }
         }
 
-        Debug.Log(verticesList[0]);
-
-
         Debug.Log(verticesList.Count);
         if (verticesList.Count > 65000)
         {
             mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         }
-
 
         mesh.vertices = verticesList.ToArray();
         mesh.triangles = trianglesList.ToArray();
@@ -577,18 +568,5 @@ public class MarchingSquarePoint
         this.state = false;
         this.weigth = _weight;
         this.idx = _idx;
-    }
-}
-
-
-
-
-public class MarchingFlood : MarchingSquarePoint
-{
-    
-
-    public MarchingFlood(Vector3 _position, bool _state, float _weight, Vector2Int _idx) : base(_position, _state, _weight, _idx)
-    {
-
     }
 }

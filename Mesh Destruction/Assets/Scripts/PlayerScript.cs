@@ -116,11 +116,8 @@ public class PlayerScript : MonoBehaviour
 
     public void ShootingRayCastManager(InputAction.CallbackContext context)
     {
-        Debug.Log("i just shoot");
-
         var x = (1 - 2 * Random.value) * 0.005f;
         var y = (1 - 2 * Random.value) * 0.005f;
-
 
         Vector3 newDir = Camera.main.transform.TransformDirection(new Vector3(x, y, 1));
 
@@ -129,8 +126,14 @@ public class PlayerScript : MonoBehaviour
 
             lastFire = Time.time;
             RaycastHit outHit;
-            if (Physics.Raycast(Camera.main.transform.position, newDir, out outHit, Mathf.Infinity, Hittable))
+            if (Physics.Raycast(Camera.main.transform.position, newDir, out outHit, Mathf.Infinity))
             {
+                if (outHit.transform.CompareTag("Wall"))  // can also check for the comp
+                {
+                    var marchComp = outHit.transform.GetComponent<MarchingSquare>();
+                    marchComp.ImpactReceiver(outHit.point);
+                }
+
                 GameObject newRef = Instantiate(bulletPrefab);
                 newRef.transform.position = outHit.point;
                 newRef.transform.parent = outHit.transform;
