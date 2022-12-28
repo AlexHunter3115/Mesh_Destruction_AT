@@ -7,7 +7,12 @@ using UnityEngine;
 public class MarchingSquare : MonoBehaviour
 {
 
+    //the issue is that the point of collision is not realtive to the parent
 
+    //the flood doestn work
+
+
+    // the rotation doesn work
 
 
     public int resolutionX = 40;
@@ -15,6 +20,7 @@ public class MarchingSquare : MonoBehaviour
 
     [SerializeField]
     public Vector3[,] verticesStatic = new Vector3[0, 0];
+    public List<Vector3> verticesStaticList = new List<Vector3>();
     MarchingSquarePoint[,] marchingPoints = new MarchingSquarePoint[0,0];
 
     List<MarchingSquarePoint> floodListMarching = new List<MarchingSquarePoint>();
@@ -35,7 +41,7 @@ public class MarchingSquare : MonoBehaviour
 
     public bool disableGizmos;
 
-    public float dist = 1.3f;   // inverse square law
+    //public float dist = 1.3f;   // inverse square law
 
 
     private void Start()
@@ -102,14 +108,24 @@ public class MarchingSquare : MonoBehaviour
         }
     }
 
-
-    public void ImpactReceiver(Vector3 impactPoint) 
+    /// <summary>
+    /// this should need the power of the projectile, the distance the frag should propagate
+    /// </summary>
+    /// <param name="impactPoint"></param>
+    public void ImpactReceiver(Vector3 impactPoint, float distanceEffect) 
     {
+        verticesStaticList.Clear();
+
         foreach (var point in marchingPoints)
         {
-            if (Vector3.Distance(impactPoint,transform.position + point.position) <= dist)
+
+            if (Vector3.Distance(impactPoint, point.position) <= distanceEffect)
             {
-                point.weigth -= Mathf.Pow(2, -(Vector3.Distance(impactPoint, transform.position + point.position)) - 0.5f);
+                verticesStaticList.Add(transform.position+point.position);
+               // Debug.Log($"This si the pos of a vertex {point.position}");
+                point.weigth -= Mathf.Pow(2, -(Vector3.Distance(impactPoint, point.position)) - 0.5f);
+
+               // Debug.Log(point.weigth);
             }
         }
         CallMarch();
@@ -209,6 +225,7 @@ public class MarchingSquare : MonoBehaviour
 
                 if (toDel) 
                 {
+                    Debug.Log($"Flood call for toDel");
                     foreach (var point in floodListMarching)
                     {
                         point.weigth = 0;
@@ -221,10 +238,6 @@ public class MarchingSquare : MonoBehaviour
             
         }
     }
-
-
-
-
 
     private void FloodCall(int x, int y) 
     {
@@ -292,7 +305,7 @@ public class MarchingSquare : MonoBehaviour
             }
         }
 
-        Debug.Log(verticesList.Count);
+        //Debug.Log(verticesList.Count);
         if (verticesList.Count > 65000)
         {
             mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
@@ -316,7 +329,7 @@ public class MarchingSquare : MonoBehaviour
     //altought here might not be like alot of tri, the arry only takes i think 60k but i am giving it 80k so need to figrue out a way
 
 
-
+    // the amount in binary and each point
     private List<Vector3> DrawOrder(int activated, MarchingSquarePoint topLeft, MarchingSquarePoint topRight, MarchingSquarePoint botLeft, MarchingSquarePoint botRight)
     {
         List<Vector3> vertices = new List<Vector3>();
@@ -541,9 +554,19 @@ public class MarchingSquare : MonoBehaviour
 
         if (!disableGizmos) 
         {
-            foreach (var vertex in verticesStatic)
+            foreach (var vertex in marchingPoints)
             {
-                Gizmos.DrawSphere(vertex, 0.01f);
+                Gizmos.DrawSphere(vertex.position, 0.01f);
+            }
+        }
+        else 
+        {
+
+            Gizmos.color = Color.green;
+            foreach (var vertex in verticesStaticList)
+            {
+
+                Gizmos.DrawSphere(vertex, 0.02f);
             }
         }
 

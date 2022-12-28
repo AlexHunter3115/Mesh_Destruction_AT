@@ -43,7 +43,7 @@ public class PlayerScript : MonoBehaviour
     public float lastFire = 0;
     public float inaccuracy = 0.1f;
 
-
+    public float distanceEffect = 0.7f;
 
 
     private void Awake()
@@ -128,15 +128,35 @@ public class PlayerScript : MonoBehaviour
             RaycastHit outHit;
             if (Physics.Raycast(Camera.main.transform.position, newDir, out outHit, Mathf.Infinity))
             {
-                if (outHit.transform.CompareTag("Wall"))  // can also check for the comp
+
+
+                if (outHit.transform.GetComponent<MarchingSquare>() != null)
                 {
+                    //Debug.Log("I have shot at a wall");
+
+
+                    GameObject newRef = Instantiate(bulletPrefab);
+
+
+                    newRef.transform.position = outHit.point;
+                    newRef.transform.parent = outHit.transform;
+
+
+
                     var marchComp = outHit.transform.GetComponent<MarchingSquare>();
-                    marchComp.ImpactReceiver(outHit.point);
+                    Debug.Log($"{newRef.transform.localPosition}");
+                    //Debug.Log($"{outHit.point}");
+
+                    marchComp.ImpactReceiver(newRef.transform.localPosition, distanceEffect);
+                }
+                else 
+                {
+
+                    GameObject newRef = Instantiate(bulletPrefab);
+                    newRef.transform.position = outHit.point;
+                    newRef.transform.parent = outHit.transform;
                 }
 
-                GameObject newRef = Instantiate(bulletPrefab);
-                newRef.transform.position = outHit.point;
-                newRef.transform.parent = outHit.transform;
             }
         }
     }
