@@ -7,12 +7,7 @@ using UnityEngine;
 public class MarchingSquare : MonoBehaviour
 {
 
-    //the issue is that the point of collision is not realtive to the parent
 
-    //the flood doestn work
-
-
-    // the rotation doesn work
 
 
     public int resolutionX = 40;
@@ -20,17 +15,14 @@ public class MarchingSquare : MonoBehaviour
 
     [SerializeField]
     public Vector3[,] verticesStatic = new Vector3[0, 0];
-    public List<Vector3> verticesStaticList = new List<Vector3>();
-    MarchingSquarePoint[,] marchingPoints = new MarchingSquarePoint[0,0];
+    MarchingSquarePoint[,] marchingPoints = new MarchingSquarePoint[0, 0];
 
     List<MarchingSquarePoint> floodListMarching = new List<MarchingSquarePoint>();
-    
+
 
 
     public bool reload;
     public bool genMarch;
-
-    
 
     public GameObject topLeft;
     public GameObject topRight;
@@ -41,7 +33,11 @@ public class MarchingSquare : MonoBehaviour
 
     public bool disableGizmos;
 
-    //public float dist = 1.3f;   // inverse square law
+    public float dist = 0.3f;   // inverse square law
+
+
+    private GameObject OtherWall;
+
 
 
     private void Start()
@@ -49,6 +45,24 @@ public class MarchingSquare : MonoBehaviour
         reload = true;
         genMarch = false;
         disableGizmos = true;
+
+        //make 4 objects
+        OtherWall = new GameObject("otherWall");
+        OtherWall.transform.parent = this.transform;
+        OtherWall.AddComponent<MeshRenderer>();
+        OtherWall.AddComponent<MeshFilter>();
+        OtherWall.AddComponent<MeshCollider>();
+
+
+
+        OtherWall.transform.localPosition = Vector3.zero;
+        //Add Components
+
+
+
+
+
+
     }
 
 
@@ -91,7 +105,10 @@ public class MarchingSquare : MonoBehaviour
             {
                 for (int x = 0; x < verticesStatic.GetLength(1); x++)
                 {
-                     marchingPoints[y, x] = new MarchingSquarePoint(verticesStatic[y, x], true, 1, new Vector2Int(x,y));
+
+                    marchingPoints[y, x] = new MarchingSquarePoint(verticesStatic[y, x], true, 1, new Vector2Int(x, y));
+
+
                 }
             }
 
@@ -108,81 +125,98 @@ public class MarchingSquare : MonoBehaviour
         }
     }
 
+
+
+    public List<Vector3> verticesStaticList = new List<Vector3>();
+
+
     /// <summary>
     /// this should need the power of the projectile, the distance the frag should propagate
     /// </summary>
     /// <param name="impactPoint"></param>
-    public void ImpactReceiver(Vector3 impactPoint, float distanceEffect) 
+    public void ImpactReceiver(Vector3 impactPoint, float distanceEffect)
     {
         verticesStaticList.Clear();
-
         foreach (var point in marchingPoints)
         {
-
             if (Vector3.Distance(impactPoint, point.position) <= distanceEffect)
             {
-                verticesStaticList.Add(transform.position+point.position);
-               // Debug.Log($"This si the pos of a vertex {point.position}");
+                verticesStaticList.Add(transform.position + point.position);
+                // Debug.Log($"This si the pos of a vertex {point.position}");
                 point.weigth -= Mathf.Pow(2, -(Vector3.Distance(impactPoint, point.position)) - 0.5f);
-
-               // Debug.Log(point.weigth);
+                // Debug.Log(point.weigth);
             }
         }
         CallMarch();
         FloodFillSetup();
     }
 
-    /*
-    void OnMouseDown()
-    {
-        Debug.Log("nefjijieijeije");
-        Ray ray = new Ray();
-        RaycastHit hit;
-
-        Vector3 mousePos = Input.mousePosition;
-
-    
-        ray = Camera.main.ScreenPointToRay(mousePos);
-
-        if (Physics.Raycast(ray, out hit))
-        {
-            Vector3 intersectionPoint = hit.point;
-            Debug.Log("call for hit");
-            foreach (var point in marchingPoints)
-            {
-                
-                if (Vector3.Distance(intersectionPoint,transform.position +point.position) <= dist) 
-                {
-                    point.weigth -= Mathf.Pow(2, -(Vector3.Distance(intersectionPoint,transform.position+ point.position))-0.5f);
-                }
-            }
-            CallMarch();
-            FloodFillSetup();
-            
-        }
-       
-    }
 
 
-    */
 
-    private void FloodFillSetup() 
+
+
+    //void OnMouseDown()
+    //{
+
+    //    Ray ray = new Ray();
+    //    RaycastHit hit;
+
+    //    Vector3 mousePos = Input.mousePosition;
+
+
+    //    ray = Camera.main.ScreenPointToRay(mousePos);
+
+    //    if (Physics.Raycast(ray, out hit))
+    //    {
+    //        Vector3 intersectionPoint = hit.point;
+
+    //        foreach (var point in marchingPoints)
+    //        {
+    //            if (Vector3.Distance(intersectionPoint, point.position) <= dist)
+    //            {
+    //                point.weigth -= Mathf.Pow(2, -(Vector3.Distance(intersectionPoint, point.position)) - 0.5f);
+    //            }
+    //        }
+    //        CallMarch();
+    //        FloodFillSetup();
+
+    //    }
+
+    //}
+
+
+
+
+
+
+
+
+    private void FloodFillSetup()
     {
         foreach (var point in marchingPoints)
         {
             point.state = false;
         }
 
+        int iter = 0;
 
         List<Vector2Int> coords = new List<Vector2Int>();
-       
-        while (true) 
+
+        while (true)
         {
             //false means its not been added
 
             coords.Clear();
 
-            
+
+            floodListMarching.Clear();
+            if (iter > 10)
+            {
+                break;
+            }
+
+
 
             bool done = true;
 
@@ -195,13 +229,14 @@ public class MarchingSquare : MonoBehaviour
                 }
             }
 
+
             if (done)
                 break;
 
             foreach (var point in marchingPoints)
             {
                 if (point.weigth >= 0.3f && !point.state) // so its visible
-                { 
+                {
                     coords.Add(point.idx);
                 }
             }
@@ -209,13 +244,14 @@ public class MarchingSquare : MonoBehaviour
             var wantedCoord = coords[Random.Range(0, coords.Count)];  //pick a random coord from the choosen ones
             FloodCall(wantedCoord.x, wantedCoord.y);
 
-            if (floodListMarching.Count > 1) 
+            if (floodListMarching.Count > 1)
             {
                 bool toDel = true;
 
+
                 foreach (var point in floodListMarching)
                 {
-                    if (point.idx.x == 0  || point.idx.y == 0 || point.idx.x == marchingPoints.GetLength(1)-1 || point.idx.y == marchingPoints.GetLength(0) - 1) 
+                    if (point.idx.x == 0 || point.idx.y == 0 || point.idx.x == marchingPoints.GetLength(1) - 1 || point.idx.y == marchingPoints.GetLength(0) - 1)
                     {
                         toDel = false;
                         break;
@@ -223,9 +259,8 @@ public class MarchingSquare : MonoBehaviour
                 }
 
 
-                if (toDel) 
+                if (toDel)
                 {
-                    Debug.Log($"Flood call for toDel");
                     foreach (var point in floodListMarching)
                     {
                         point.weigth = 0;
@@ -235,18 +270,27 @@ public class MarchingSquare : MonoBehaviour
                     CallMarch();    // this prob can be put somewhere else so its doesnt call all the time
                 }
             }
-            
+
+
+            iter++;
         }
     }
 
-    private void FloodCall(int x, int y) 
+
+
+
+
+
+
+
+    private void FloodCall(int x, int y)
     {
 
         if (y >= 0 && x >= 0 && y < marchingPoints.GetLength(0) && x < marchingPoints.GetLength(1))
         {
 
             //Debug.Log($"{marchingPoints[y, x].state} and {marchingPoints[y, x].weigth}  for  {x} and {y}");
-            if (!marchingPoints[y,x].state && marchingPoints[y,x].weigth >= 0.3f)
+            if (!marchingPoints[y, x].state && marchingPoints[y, x].weigth >= 0.3f)
             {
                 //Debug.Log($"{x} and {y} are in hereiurewieriureiuoeriou");
                 marchingPoints[y, x].state = true;
@@ -262,10 +306,15 @@ public class MarchingSquare : MonoBehaviour
     }
 
 
-    /// <summary>
-    /// this calls for the re-creation of the whole wall
-    /// </summary>
-    private void CallMarch() 
+
+
+
+
+
+
+
+
+    private void CallMarch()
     {
 
         Mesh mesh = GetComponent<MeshFilter>().mesh;
@@ -323,19 +372,42 @@ public class MarchingSquare : MonoBehaviour
         GetComponent<MeshCollider>().convex = false;
         GetComponent<MeshCollider>().sharedMesh = mesh;
 
+
+
+
+
+
+        var otherWallMesh = OtherWall.GetComponent<MeshFilter>().mesh;
+
+        trianglesList.Reverse();
+
+
+        otherWallMesh.vertices = verticesList.ToArray();
+        otherWallMesh.triangles = trianglesList.ToArray();
+
+
+        OtherWall.GetComponent<MeshRenderer>().material = mat;
+        otherWallMesh.RecalculateBounds();
+        otherWallMesh.RecalculateNormals();
+        otherWallMesh.RecalculateTangents();
+
+        OtherWall.GetComponent<MeshCollider>().convex = false;
+        OtherWall.GetComponent<MeshCollider>().sharedMesh = otherWallMesh;
+
+
     }
 
 
     //altought here might not be like alot of tri, the arry only takes i think 60k but i am giving it 80k so need to figrue out a way
 
 
-    // the amount in binary and each point
+
     private List<Vector3> DrawOrder(int activated, MarchingSquarePoint topLeft, MarchingSquarePoint topRight, MarchingSquarePoint botLeft, MarchingSquarePoint botRight)
     {
         List<Vector3> vertices = new List<Vector3>();
 
 
-        Vector3 midLeft = Vector3.Lerp(topLeft.position, botLeft.position, topLeft.weigth/(topLeft.weigth + botLeft.weigth));
+        Vector3 midLeft = Vector3.Lerp(topLeft.position, botLeft.position, topLeft.weigth / (topLeft.weigth + botLeft.weigth));
         Vector3 midRight = Vector3.Lerp(topRight.position, botRight.position, topRight.weigth / (topRight.weigth + botRight.weigth));
         Vector3 midTop = Vector3.Lerp(topLeft.position, topRight.position, topLeft.weigth / (topLeft.weigth + topRight.weigth));
         Vector3 midBot = Vector3.Lerp(botLeft.position, botRight.position, botLeft.weigth / (botLeft.weigth + botRight.weigth));
@@ -401,7 +473,7 @@ public class MarchingSquare : MonoBehaviour
 
                 break;
 
-            case 6:  
+            case 6:
 
                 vertices.Add(botRight.position);
                 vertices.Add(midBot);
@@ -552,21 +624,11 @@ public class MarchingSquare : MonoBehaviour
     private void OnDrawGizmos()
     {
 
-        if (!disableGizmos) 
+        if (!disableGizmos)
         {
-            foreach (var vertex in marchingPoints)
+            foreach (var vertex in verticesStatic)
             {
-                Gizmos.DrawSphere(vertex.position, 0.01f);
-            }
-        }
-        else 
-        {
-
-            Gizmos.color = Color.green;
-            foreach (var vertex in verticesStaticList)
-            {
-
-                Gizmos.DrawSphere(vertex, 0.02f);
+                Gizmos.DrawSphere(vertex, 0.01f);
             }
         }
 
@@ -585,7 +647,7 @@ public class MarchingSquarePoint
     public Vector2Int idx;
 
 
-    public MarchingSquarePoint(Vector3 _position, bool _state,float _weight, Vector2Int _idx)
+    public MarchingSquarePoint(Vector3 _position, bool _state, float _weight, Vector2Int _idx)
     {
         this.position = _position;
         this.state = false;
@@ -593,3 +655,6 @@ public class MarchingSquarePoint
         this.idx = _idx;
     }
 }
+
+
+

@@ -128,35 +128,24 @@ public class PlayerScript : MonoBehaviour
             RaycastHit outHit;
             if (Physics.Raycast(Camera.main.transform.position, newDir, out outHit, Mathf.Infinity))
             {
-
-
                 if (outHit.transform.GetComponent<MarchingSquare>() != null)
                 {
-                    //Debug.Log("I have shot at a wall");
-
 
                     GameObject newRef = Instantiate(bulletPrefab);
-
 
                     newRef.transform.position = outHit.point;
                     newRef.transform.parent = outHit.transform;
 
-
-
                     var marchComp = outHit.transform.GetComponent<MarchingSquare>();
-                    Debug.Log($"{newRef.transform.localPosition}");
-                    //Debug.Log($"{outHit.point}");
 
                     marchComp.ImpactReceiver(newRef.transform.localPosition, distanceEffect);
                 }
                 else 
                 {
-
                     GameObject newRef = Instantiate(bulletPrefab);
                     newRef.transform.position = outHit.point;
                     newRef.transform.parent = outHit.transform;
                 }
-
             }
         }
     }

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class test : MonoBehaviour
 {
-    private void OnMouseDown()
-    {
-        Debug.Log("eiijeiijejiew");
-    }
+    //private void OnMouseDown()
+    //{
+    //    Debug.Log("eiijeiijejiew");
+    //}
 }
