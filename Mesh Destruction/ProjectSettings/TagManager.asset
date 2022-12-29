@@ -16,8 +16,8 @@ TagManager:
   - UI
   - Wall1
   - Wall2
-  - 
-  - 
+  - innerWall
+  - outerWall
   - 
   - 
   - 

@@ -96,4 +96,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 810cce47a4fd52c47868a4122c61ef60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destoryTimer: 20
+  destoryTimer: 2

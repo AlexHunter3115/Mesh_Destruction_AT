@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -15,9 +16,9 @@ public class MarchingSquare : MonoBehaviour
 
     [SerializeField]
     public Vector3[,] verticesStatic = new Vector3[0, 0];
-    MarchingSquarePoint[,] marchingPoints = new MarchingSquarePoint[0, 0];
+    public MarchingSquarePoint[,] marchingPoints = new MarchingSquarePoint[0, 0];
 
-    List<MarchingSquarePoint> floodListMarching = new List<MarchingSquarePoint>();
+    public List<MarchingSquarePoint> floodListMarching = new List<MarchingSquarePoint>();
 
 
 
@@ -30,32 +31,47 @@ public class MarchingSquare : MonoBehaviour
     public GameObject botLeft;
 
     public Material mat;
+    public Material insideMat;
 
     public bool disableGizmos;
 
     public float dist = 0.3f;   // inverse square law
 
+    public GameObject mirrorWall;
 
-    private GameObject OtherWall;
+    public bool inner = false;
+
+    //private GameObject OtherWall;
 
 
 
     private void Start()
     {
-        reload = true;
-        genMarch = false;
+        //reload = false;
+        //genMarch = false;
+        CallMarch();
+
+
         disableGizmos = true;
 
         //make 4 objects
-        OtherWall = new GameObject("otherWall");
-        OtherWall.transform.parent = this.transform;
-        OtherWall.AddComponent<MeshRenderer>();
-        OtherWall.AddComponent<MeshFilter>();
-        OtherWall.AddComponent<MeshCollider>();
+        //OtherWall = new GameObject("otherWall");
+        //OtherWall.transform.parent = this.transform;
+        //OtherWall.AddComponent<MeshRenderer>();
+        //OtherWall.AddComponent<MeshFilter>();
+        ////OtherWall.AddComponent<MeshCollider>();
 
 
 
-        OtherWall.transform.localPosition = Vector3.zero;
+        //OtherWall.transform.localPosition = Vector3.zero;
+
+        //if (this.transform.localRotation == Quaternion.Euler(0, 180, 0)) 
+        //{
+        //    OtherWall.transform.localRotation = Quaternion.Euler(0, 0, 0);
+        //}
+
+        //OtherWall.layer = LayerMask.NameToLayer("innerWall");
+       //OtherWall.transform.localRotation = ;
         //Add Components
 
 
@@ -68,61 +84,58 @@ public class MarchingSquare : MonoBehaviour
 
     private void Update()
     {
-        if (reload)
-        {
-            reload = false;
+        //if (reload)
+        //{
+        //    reload = false;
 
-            Vector3 topLeftPos = topLeft.transform.localPosition;   //loc
-            Vector3 topRightPos = topRight.transform.localPosition;
-            Vector3 botLeftPos = botLeft.transform.localPosition;
-            Vector3 botRightPos = botRight.transform.localPosition;
+        //    Vector3 topLeftPos = topLeft.transform.localPosition;   //loc
+        //    Vector3 topRightPos = topRight.transform.localPosition;
+        //    Vector3 botLeftPos = botLeft.transform.localPosition;
+        //    Vector3 botRightPos = botRight.transform.localPosition;
 
-            verticesStatic = new Vector3[resolutionY + 1, resolutionX + 1];
+        //    verticesStatic = new Vector3[resolutionY + 1, resolutionX + 1];
 
-            var yListLeft = new List<Vector3>();
-            var yListRight = new List<Vector3>();
+        //    var yListLeft = new List<Vector3>();
+        //    var yListRight = new List<Vector3>();
 
-            for (int i = 0; i < resolutionY + 1; i++)
-            {
-                float lerpVal = (float)i / (float)resolutionY;
-                yListLeft.Add(Vector3.Lerp(topLeftPos, botLeftPos, lerpVal));
+        //    for (int i = 0; i < resolutionY + 1; i++)
+        //    {
+        //        float lerpVal = (float)i / (float)resolutionY;
+        //        yListLeft.Add(Vector3.Lerp(topLeftPos, botLeftPos, lerpVal));
 
-                yListRight.Add(Vector3.Lerp(topRightPos, botRightPos, lerpVal));
-            }
+        //        yListRight.Add(Vector3.Lerp(topRightPos, botRightPos, lerpVal));
+        //    }
 
-            for (int y = 0; y < yListLeft.Count; y++)
-            {
-                for (int x = 0; x < resolutionX + 1; x++)
-                {
-                    float lerpVal = (float)x / (float)resolutionX;
-                    verticesStatic[y, x] = Vector3.Lerp(yListLeft[y], yListRight[y], lerpVal);
-                }
-            }
+        //    for (int y = 0; y < yListLeft.Count; y++)
+        //    {
+        //        for (int x = 0; x < resolutionX + 1; x++)
+        //        {
+        //            float lerpVal = (float)x / (float)resolutionX;
+        //            verticesStatic[y, x] = Vector3.Lerp(yListLeft[y], yListRight[y], lerpVal);
+        //        }
+        //    }
 
-            marchingPoints = new MarchingSquarePoint[resolutionY + 1, resolutionX + 1];
+        //    marchingPoints = new MarchingSquarePoint[resolutionY + 1, resolutionX + 1];
 
-            for (int y = 0; y < verticesStatic.GetLength(0); y++)
-            {
-                for (int x = 0; x < verticesStatic.GetLength(1); x++)
-                {
+        //    for (int y = 0; y < verticesStatic.GetLength(0); y++)
+        //    {
+        //        for (int x = 0; x < verticesStatic.GetLength(1); x++)
+        //        {
+        //            marchingPoints[y, x] = new MarchingSquarePoint(verticesStatic[y, x], true, 1, new Vector2Int(x, y));
+        //        }
+        //    }
 
-                    marchingPoints[y, x] = new MarchingSquarePoint(verticesStatic[y, x], true, 1, new Vector2Int(x, y));
+        //    CallMarch();
 
-
-                }
-            }
-
-            CallMarch();
-
-        }
+        //}
 
 
 
-        if (genMarch)
-        {
-            genMarch = false;
-            CallMarch();
-        }
+        //if (genMarch)
+        //{
+        //    genMarch = false;
+        //    CallMarch();
+        //}
     }
 
 
@@ -149,9 +162,33 @@ public class MarchingSquare : MonoBehaviour
         }
         CallMarch();
         FloodFillSetup();
+        mirrorWall.GetComponent<MarchingSquare>().CopyMesh(this.GetComponent<MeshFilter>().mesh);
     }
 
+    public void CopyMesh(Mesh meshToCopy) 
+    {
+        Mesh mesh = GetComponent<MeshFilter>().mesh;
 
+        mesh.Clear();
+
+        mesh.indexFormat = meshToCopy.indexFormat;
+
+        var arr = meshToCopy.triangles.ToList();
+
+        arr.Reverse();
+
+        mesh.vertices = meshToCopy.vertices;
+        mesh.triangles = arr.ToArray();
+
+        this.GetComponent<MeshRenderer>().material = mat;
+        mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
+        mesh.RecalculateTangents();
+
+        GetComponent<MeshCollider>().convex = false;
+        GetComponent<MeshCollider>().sharedMesh = mesh;
+
+    }
 
 
 
@@ -306,14 +343,6 @@ public class MarchingSquare : MonoBehaviour
     }
 
 
-
-
-
-
-
-
-
-
     private void CallMarch()
     {
 
@@ -331,7 +360,7 @@ public class MarchingSquare : MonoBehaviour
             {
 
                 int binary = 0;
-
+                
                 var marchSquareTL = marchingPoints[y, x];    //8
                 var marchSquareTR = marchingPoints[y, x + 1];   //4
 
@@ -360,6 +389,9 @@ public class MarchingSquare : MonoBehaviour
             mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         }
 
+        if (inner)
+        trianglesList.Reverse();
+
         mesh.vertices = verticesList.ToArray();
         mesh.triangles = trianglesList.ToArray();
 
@@ -377,22 +409,25 @@ public class MarchingSquare : MonoBehaviour
 
 
 
-        var otherWallMesh = OtherWall.GetComponent<MeshFilter>().mesh;
+        //var otherWallMesh = OtherWall.GetComponent<MeshFilter>().mesh;
 
-        trianglesList.Reverse();
+        //otherWallMesh.Clear();
+        //if (verticesList.Count > 65000)
+        //{
+        //    otherWallMesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+        //}
 
+        //trianglesList.Reverse();
 
-        otherWallMesh.vertices = verticesList.ToArray();
-        otherWallMesh.triangles = trianglesList.ToArray();
+        //otherWallMesh.vertices = verticesList.ToArray();
+        //otherWallMesh.triangles = trianglesList.ToArray();
 
+        //OtherWall.GetComponent<MeshRenderer>().material = insideMat;
+        //otherWallMesh.RecalculateBounds();
+        //otherWallMesh.RecalculateNormals();
+        //otherWallMesh.RecalculateTangents();
 
-        OtherWall.GetComponent<MeshRenderer>().material = mat;
-        otherWallMesh.RecalculateBounds();
-        otherWallMesh.RecalculateNormals();
-        otherWallMesh.RecalculateTangents();
-
-        OtherWall.GetComponent<MeshCollider>().convex = false;
-        OtherWall.GetComponent<MeshCollider>().sharedMesh = otherWallMesh;
+       
 
 
     }

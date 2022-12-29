@@ -126,7 +126,7 @@ public class PlayerScript : MonoBehaviour
 
             lastFire = Time.time;
             RaycastHit outHit;
-            if (Physics.Raycast(Camera.main.transform.position, newDir, out outHit, Mathf.Infinity))
+            if (Physics.Raycast(Camera.main.transform.position, newDir, out outHit, Mathf.Infinity, ~Hittable))
             {
                 if (outHit.transform.GetComponent<MarchingSquare>() != null)
                 {
@@ -146,6 +146,8 @@ public class PlayerScript : MonoBehaviour
                     newRef.transform.position = outHit.point;
                     newRef.transform.parent = outHit.transform;
                 }
+
+                Debug.Log($"{outHit.transform.name}");
             }
         }
     }
