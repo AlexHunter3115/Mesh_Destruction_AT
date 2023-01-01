@@ -25,9 +25,19 @@ public class CreateMSQPlanes : MonoBehaviour
 
     public Material mat;
 
+
+    /// <summary>
+    /// x is distance 
+    /// and the y is the damage
+    /// </summary>
+    [SerializeField]
+    public AnimationCurve weightDistribution = new AnimationCurve();
+
+
     // Start is called before the first frame update
     void Start()
     {
+
 
         #region innerWall2
 
@@ -42,6 +52,8 @@ public class CreateMSQPlanes : MonoBehaviour
         march.resolutionX = resolutionX;
         march.resolutionY = resolutionY;
 
+        march.weightDistribution = weightDistribution;
+        march.weightDistribution = weightDistribution;
 
         march.mirrorWall = outerWall2;
 
@@ -103,6 +115,7 @@ public class CreateMSQPlanes : MonoBehaviour
         march.resolutionX = resolutionX;
         march.resolutionY = resolutionY;
 
+        march.weightDistribution = weightDistribution;
         march.inner = false;
         march.mat = mat;
 
@@ -155,10 +168,6 @@ public class CreateMSQPlanes : MonoBehaviour
 
 
 
-
-
-
-
         #region outerWall1
 
         outerWall1 = new GameObject("outerWall1");
@@ -170,6 +179,7 @@ public class CreateMSQPlanes : MonoBehaviour
         march.resolutionX = resolutionX;
         march.resolutionY = resolutionY;
 
+        march.weightDistribution = weightDistribution;
         march.inner = true;
         march.mat = mat;
         march.mirrorWall = innerWall1;
@@ -232,6 +242,7 @@ public class CreateMSQPlanes : MonoBehaviour
         march.resolutionY = resolutionY;
         march.mirrorWall = innerWall2;
 
+        march.weightDistribution = weightDistribution;
         march.inner = false;
         march.mat = mat;
 

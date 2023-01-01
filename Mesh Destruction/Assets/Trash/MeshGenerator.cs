@@ -519,7 +519,7 @@ public class MeshGenerator : MonoBehaviour
         MeshPart createdPart = new MeshPart();
 
         edgeSet = false;
-        bool firstCall = false;
+        //bool firstCall = false;
         Vector3 fillSavedVertex = Vector3.zero;
 
         Ray ray1 = new Ray();

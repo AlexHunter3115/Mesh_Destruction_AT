@@ -35,12 +35,15 @@ public class MarchingSquare : MonoBehaviour
 
     public bool disableGizmos;
 
-    public float dist = 0.3f;   // inverse square law
+    public float dist = 0.3f;   // inverse square law     // never used
 
     public GameObject mirrorWall;
 
     public bool inner = false;
 
+    public float minimumWeight = 0.3f;
+    [SerializeField]
+    public AnimationCurve weightDistribution = new AnimationCurve();
     //private GameObject OtherWall;
 
 
@@ -142,13 +145,20 @@ public class MarchingSquare : MonoBehaviour
 
     public List<Vector3> verticesStaticList = new List<Vector3>();
 
-
-    /// <summary>
-    /// this should need the power of the projectile, the distance the frag should propagate
-    /// </summary>
-    /// <param name="impactPoint"></param>
-    public void ImpactReceiver(Vector3 impactPoint, float distanceEffect)
+    //might deete the wall check and just leave it, we could power down the projectile based on the travled distance
+  /// <summary>
+  /// Call this to receive a shoot to this plane and run the marhching cubes
+  /// </summary>
+  /// <param name="impactPoint"></param>
+  /// <param name="distanceEffect"></param>
+  /// <param name="direction"></param>
+  /// <param name="wall">false if its needs to propegate</param>
+    public void ImpactReceiver(Vector3 impactPoint, float distanceEffect, Vector3 direction, bool wall = false)
     {
+
+
+        Debug.Log($"dsdsasdasdasdsad");
+
         verticesStaticList.Clear();
         foreach (var point in marchingPoints)
         {
@@ -156,13 +166,56 @@ public class MarchingSquare : MonoBehaviour
             {
                 verticesStaticList.Add(transform.position + point.position);
                 // Debug.Log($"This si the pos of a vertex {point.position}");
-                point.weigth -= Mathf.Pow(2, -(Vector3.Distance(impactPoint, point.position)) - 0.5f);
+
+
+
+
+                //Debug.Log(weightDistribution.Evaluate(Vector3.Distance(impactPoint, point.position)));
+                point.weigth -= weightDistribution.Evaluate(Vector3.Distance(impactPoint, point.position));
+                
+
+
+
+                //point.weigth -= Mathf.Pow(2, -(Vector3.Distance(impactPoint, point.position)) - 0.5f);      
+
+
+
                 // Debug.Log(point.weigth);
+                //if (point.weigth > minimumWeight) 
+                //{
+                //    point.weigth = 0.95f;
+                //}
             }
         }
         CallMarch();
         FloodFillSetup();
         mirrorWall.GetComponent<MarchingSquare>().CopyMesh(this.GetComponent<MeshFilter>().mesh);
+
+        if (!wall)
+        {
+            Debug.Log($"ioweioewioueioue");
+            RaycastHit hit;
+            // Does the ray intersect any objects excluding the player layer
+            if (Physics.Raycast(transform.TransformPoint(impactPoint), direction, out hit, Mathf.Infinity))
+            {
+                Debug.Log(hit.transform.name);
+                Debug.Log(hit.point);
+                Debug.DrawRay(transform.TransformPoint(impactPoint), direction * hit.distance, Color.yellow, 20);
+                if (hit.transform.GetComponent<MarchingSquare>() != null)
+                {
+                    Debug.Log($"fdssdfdfsdfsfds");
+                    GameObject newRef = Instantiate(PlayerScript.instance.bulletPrefab);
+
+                    newRef.transform.position = hit.point;
+                    newRef.transform.parent = hit.transform;
+
+                    var marchComp = hit.transform.GetComponent<MarchingSquare>();
+
+                    marchComp.ImpactReceiver(newRef.transform.localPosition, distanceEffect, direction, true);
+                }
+
+            }
+        }
     }
 
     public void CopyMesh(Mesh meshToCopy) 
@@ -189,42 +242,6 @@ public class MarchingSquare : MonoBehaviour
         GetComponent<MeshCollider>().sharedMesh = mesh;
 
     }
-
-
-
-
-    //void OnMouseDown()
-    //{
-
-    //    Ray ray = new Ray();
-    //    RaycastHit hit;
-
-    //    Vector3 mousePos = Input.mousePosition;
-
-
-    //    ray = Camera.main.ScreenPointToRay(mousePos);
-
-    //    if (Physics.Raycast(ray, out hit))
-    //    {
-    //        Vector3 intersectionPoint = hit.point;
-
-    //        foreach (var point in marchingPoints)
-    //        {
-    //            if (Vector3.Distance(intersectionPoint, point.position) <= dist)
-    //            {
-    //                point.weigth -= Mathf.Pow(2, -(Vector3.Distance(intersectionPoint, point.position)) - 0.5f);
-    //            }
-    //        }
-    //        CallMarch();
-    //        FloodFillSetup();
-
-    //    }
-
-    //}
-
-
-
-
 
 
 
@@ -312,14 +329,6 @@ public class MarchingSquare : MonoBehaviour
             iter++;
         }
     }
-
-
-
-
-
-
-
-
     private void FloodCall(int x, int y)
     {
 
@@ -341,6 +350,8 @@ public class MarchingSquare : MonoBehaviour
             }
         }
     }
+
+
 
 
     private void CallMarch()
@@ -367,10 +378,10 @@ public class MarchingSquare : MonoBehaviour
                 var marchSquareBL = marchingPoints[y + 1, x];   // 1
                 var marchSquareBR = marchingPoints[y + 1, x + 1];    //2
 
-                if (marchSquareTL.weigth >= 0.3f) { binary += 8; }
-                if (marchSquareTR.weigth >= 0.3f) { binary += 4; }
-                if (marchSquareBR.weigth >= 0.3f) { binary += 2; }
-                if (marchSquareBL.weigth >= 0.3f) { binary += 1; }
+                if (marchSquareTL.weigth >= minimumWeight) { binary += 8; }
+                if (marchSquareTR.weigth >= minimumWeight) { binary += 4; }
+                if (marchSquareBR.weigth >= minimumWeight) { binary += 2; }
+                if (marchSquareBL.weigth >= minimumWeight) { binary += 1; }
 
                 var addingList = DrawOrder(binary, marchSquareTL, marchSquareTR, marchSquareBL, marchSquareBR);
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.HID;
 //using UnityEngine.InputSystem.HID;Pla
 using Random = UnityEngine.Random;
 
@@ -126,7 +127,7 @@ public class PlayerScript : MonoBehaviour
 
             lastFire = Time.time;
             RaycastHit outHit;
-            if (Physics.Raycast(Camera.main.transform.position, newDir, out outHit, Mathf.Infinity, ~Hittable))
+            if (Physics.Raycast(Camera.main.transform.position, newDir, out outHit, Mathf.Infinity))
             {
                 if (outHit.transform.GetComponent<MarchingSquare>() != null)
                 {
@@ -138,7 +139,7 @@ public class PlayerScript : MonoBehaviour
 
                     var marchComp = outHit.transform.GetComponent<MarchingSquare>();
 
-                    marchComp.ImpactReceiver(newRef.transform.localPosition, distanceEffect);
+                    marchComp.ImpactReceiver(newRef.transform.localPosition, distanceEffect, newDir);
                 }
                 else 
                 {
@@ -147,7 +148,8 @@ public class PlayerScript : MonoBehaviour
                     newRef.transform.parent = outHit.transform;
                 }
 
-                Debug.Log($"{outHit.transform.name}");
+                //Debug.DrawRay(Camera.main.transform.position, newDir * outHit.distance, Color.yellow, 90);
+                //Debug.Log($"{outHit.transform.name}");
             }
         }
     }
