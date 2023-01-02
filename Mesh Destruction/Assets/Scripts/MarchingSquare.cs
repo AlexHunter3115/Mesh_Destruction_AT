@@ -199,6 +199,8 @@ public class MarchingSquare : MonoBehaviour
     {
         Mesh mesh = GetComponent<MeshFilter>().mesh;
 
+        otherWallMarchinSquare.marchingPoints = marchingPoints;
+
         mesh.Clear();
 
         mesh.indexFormat = meshToCopy.indexFormat;
@@ -237,7 +239,7 @@ public class MarchingSquare : MonoBehaviour
         while (true)
         {
             //false means its not been added
-
+            Debug.Log($"ERWIOUERIWUOERWIUOERWIOERIWOUREIUO");
             coords.Clear();
             floodListMarching.Clear();
             if (iter > 10)
@@ -294,7 +296,7 @@ public class MarchingSquare : MonoBehaviour
                     foreach (var point in floodListMarching)
                     {
 
-                        if (point.weigth <= 0.97f) 
+                        if (point.weigth <= 0.95f) 
                         {
                             vectorOfVectors.Add(point.position);
 

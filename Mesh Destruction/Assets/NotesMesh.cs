@@ -42,31 +42,12 @@ https://drive.google.com/file/d/1O0d_pqitpgbFYJG06JO6uAJjudI-QHwn/view       htt
 
 
 
- ----------------------------------  TODAY TO DO  ----------------------------------
-  spanw fragments from the flood array
-
-
-     
-    harder stuff beaneh
-
-  fix the gen issue    hings that i ahve explored is the resetting of the weight but that amkes a bit of a mess          
-    tightening the animation curve seems to have done the job i guess
-
-
-
-
-
-
-
  ----------------------------------  TO DO  ----------------------------------
 
-spawn the created fragment using convex hull    
 
 find a nice asset pack
 
-create the wall, right now its one layer, we need two  -- done
-
-do the 4 wall setup
+performance thigns
 
 
 Game idea - i was thinking zombies tbh, the zombies walk to the window, break it
