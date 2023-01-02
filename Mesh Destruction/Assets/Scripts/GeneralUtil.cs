@@ -51,13 +51,7 @@ public static class GeneralUtil
                 }
             }
 
-
-
-
-            // honestly not too sure but prob has 
             List<Edge> polygon = new List<Edge>();
-
-
 
             //for every triangle in bad triangls
             foreach (Triangle triangle in badTriangles)
@@ -216,24 +210,23 @@ public static class GeneralUtil
         else { return false; }
     }
 
+
+
+
     /// <summary>
-    /// 
+    /// Gives a certin amoutn of point and it will return the triangle array and the vector array to create the convex hull
     /// </summary>
     /// <param name="points"></param>
     /// <returns>first is the vertices then the tringles index</returns>
     public static Tuple<List<Vector3>, List<int>> IncrementalConvex(List<Vector3> points) 
     {
+
+        Debug.Log(points.Count);
+
         var vertecies = new List<Vector3>();
         var triangle = new List<int>();
 
        var triangles = new List<Triangle>();
-
-
-
-
-
-
-
 
 
         triangles.Add(new Triangle(points[0], points[1], points[2]));

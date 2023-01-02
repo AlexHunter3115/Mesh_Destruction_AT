@@ -156,9 +156,6 @@ public class MarchingSquare : MonoBehaviour
     public void ImpactReceiver(Vector3 impactPoint, float distanceEffect, Vector3 direction, bool wall = false)
     {
 
-
-        Debug.Log($"dsdsasdasdasdsad");
-
         verticesStaticList.Clear();
         foreach (var point in marchingPoints)
         {
@@ -193,17 +190,13 @@ public class MarchingSquare : MonoBehaviour
 
         if (!wall)
         {
-            Debug.Log($"ioweioewioueioue");
             RaycastHit hit;
             // Does the ray intersect any objects excluding the player layer
             if (Physics.Raycast(transform.TransformPoint(impactPoint), direction, out hit, Mathf.Infinity))
             {
-                Debug.Log(hit.transform.name);
-                Debug.Log(hit.point);
                 Debug.DrawRay(transform.TransformPoint(impactPoint), direction * hit.distance, Color.yellow, 20);
                 if (hit.transform.GetComponent<MarchingSquare>() != null)
                 {
-                    Debug.Log($"fdssdfdfsdfsfds");
                     GameObject newRef = Instantiate(PlayerScript.instance.bulletPrefab);
 
                     newRef.transform.position = hit.point;
@@ -315,10 +308,28 @@ public class MarchingSquare : MonoBehaviour
 
                 if (toDel)
                 {
+                    var vectorOfVectors = new List<Vector3>();
+                    bool side;
+
                     foreach (var point in floodListMarching)
                     {
+                        vectorOfVectors.Add(point.position);
+
+                        if (this.transform.localPosition.x > 0)
+                            vectorOfVectors.Add(new Vector3(point.position.x -0.05f, point.position.y, point.position.z));
+                        else
+                            vectorOfVectors.Add(new Vector3(point.position.x +0.05f, point.position.y, point.position.z));
+
                         point.weigth = 0;
                     }
+                
+                    if (this.transform.localPosition.x > 0)
+                        side = true;
+                    else
+                        side = false;
+
+
+                    FormObject(vectorOfVectors,side);
 
                     //call a fucntion here to take the vertex and create an obj the floodlist has all the vertecies
                     CallMarch();    // this prob can be put somewhere else so its doesnt call all the time
@@ -329,6 +340,69 @@ public class MarchingSquare : MonoBehaviour
             iter++;
         }
     }
+
+
+
+
+
+
+
+
+    public void FormObject(List<Vector3> arrOfVec,bool side)
+    {
+        var meshInfor = GeneralUtil.IncrementalConvex(arrOfVec);
+        Debug.Log(side);
+        GameObject newPart = new GameObject();
+        newPart.transform.position = this.transform.position;
+        newPart.transform.rotation = this.transform.rotation;
+        newPart.transform.localScale = this.transform.localScale;
+
+        var mesh = new Mesh();
+        mesh.name = "Fragment";
+
+        mesh.vertices = meshInfor.Item1.ToArray();
+
+
+        mesh.triangles = meshInfor.Item2.ToArray();
+
+        mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
+        mesh.RecalculateTangents();
+
+
+        var renderer = newPart.AddComponent<MeshRenderer>();
+        renderer.materials = this.GetComponent<MeshRenderer>().materials;
+
+        var filter = newPart.AddComponent<MeshFilter>();
+        filter.mesh = mesh;
+
+        var collider = newPart.AddComponent<MeshCollider>();
+        collider.convex = true;
+
+        var rigidbody = newPart.AddComponent<Rigidbody>();
+
+
+
+        //rigidbody.AddForce(this.transform.up * 5, ForceMode.Impulse);
+
+        if (side)
+            rigidbody.AddForce(this.transform.right * 2, ForceMode.Impulse);
+        else
+            rigidbody.AddForce(this.transform.right * -2, ForceMode.Impulse);
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     private void FloodCall(int x, int y)
     {
 
@@ -414,32 +488,6 @@ public class MarchingSquare : MonoBehaviour
 
         GetComponent<MeshCollider>().convex = false;
         GetComponent<MeshCollider>().sharedMesh = mesh;
-
-
-
-
-
-
-        //var otherWallMesh = OtherWall.GetComponent<MeshFilter>().mesh;
-
-        //otherWallMesh.Clear();
-        //if (verticesList.Count > 65000)
-        //{
-        //    otherWallMesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
-        //}
-
-        //trianglesList.Reverse();
-
-        //otherWallMesh.vertices = verticesList.ToArray();
-        //otherWallMesh.triangles = trianglesList.ToArray();
-
-        //OtherWall.GetComponent<MeshRenderer>().material = insideMat;
-        //otherWallMesh.RecalculateBounds();
-        //otherWallMesh.RecalculateNormals();
-        //otherWallMesh.RecalculateTangents();
-
-       
-
 
     }
 

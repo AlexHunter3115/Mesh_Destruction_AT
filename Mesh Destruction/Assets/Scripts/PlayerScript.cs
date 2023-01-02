@@ -46,6 +46,7 @@ public class PlayerScript : MonoBehaviour
 
     public float distanceEffect = 0.7f;
 
+    public GameObject effect;
 
     private void Awake()
     {
@@ -148,6 +149,7 @@ public class PlayerScript : MonoBehaviour
                     newRef.transform.parent = outHit.transform;
                 }
 
+                Instantiate(effect, outHit.point, effect.transform.rotation);
                 //Debug.DrawRay(Camera.main.transform.position, newDir * outHit.distance, Color.yellow, 90);
                 //Debug.Log($"{outHit.transform.name}");
             }

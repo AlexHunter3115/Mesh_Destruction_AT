@@ -45,8 +45,6 @@ https://drive.google.com/file/d/1O0d_pqitpgbFYJG06JO6uAJjudI-QHwn/view       htt
  ----------------------------------  TODAY TO DO  ----------------------------------
   spanw fragments from the flood array
 
-  spawn some effects
-
 
      
     harder stuff beaneh
@@ -55,9 +53,6 @@ https://drive.google.com/file/d/1O0d_pqitpgbFYJG06JO6uAJjudI-QHwn/view       htt
     tightening the animation curve seems to have done the job i guess
 
 
-
-
-    add some columns
 
 
 
