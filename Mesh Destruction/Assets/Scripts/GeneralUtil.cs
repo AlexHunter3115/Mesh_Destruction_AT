@@ -221,6 +221,9 @@ public static class GeneralUtil
     public static Tuple<List<Vector3>, List<int>> IncrementalConvex(List<Vector3> points) 
     {
 
+        int time = Environment.TickCount & Int32.MaxValue;
+
+
         Debug.Log(points.Count);
 
         var vertecies = new List<Vector3>();
@@ -247,7 +250,7 @@ public static class GeneralUtil
 
         while (points.Count > 1)
         {
-            if (iter > 100)
+            if (iter > 120)
             {
                 Debug.Log($"exit on the iter");
                 //destroy = true;
@@ -256,14 +259,8 @@ public static class GeneralUtil
             iter++;
 
 
-
-
-            int randomIndex = 0;
-
             for (int i = points.Count; i-- > 0;)
             {
-
-
                 bool insideHull = false;
                 foreach (var tri in triangles)
                 {
@@ -274,23 +271,15 @@ public static class GeneralUtil
                         insideHull = true;
                         break;
                     }
-                    else   //inside
-                    {
-
-                    }
                 }
 
                 if (!insideHull)
                 {
                     points.RemoveAt(i);
                 }
-                else
-                {
-
-                }
             }
 
-            randomIndex = Random.Range(0, points.Count);
+            int randomIndex = Random.Range(0, points.Count-1);
 
             List<int> interestedTris = new List<int>();
 
@@ -299,7 +288,6 @@ public static class GeneralUtil
             for (int i = 0; i < triangles.Count; i++)
             {
                 Plane plane = new Plane(triangles[i].a, triangles[i].b, triangles[i].c);
-
                 if (plane.GetSide(points[randomIndex]))
                 {
                     interestedTris.Add(i);
@@ -309,7 +297,7 @@ public static class GeneralUtil
             interestedTris.Sort();
             interestedTris.Reverse();
 
-            List<Edge> interestedEdges = new List<Edge>();
+
             List<Triangle> rejectedTrigs = new List<Triangle>();
 
             foreach (var removeIdx in interestedTris)
@@ -414,7 +402,9 @@ public static class GeneralUtil
 
 
 
+        int timerEnd = Environment.TickCount & Int32.MaxValue;
 
+        Debug.Log($"<color=yellow>Performance: This operation took {timerEnd - time} ticks</color>");
 
 
 

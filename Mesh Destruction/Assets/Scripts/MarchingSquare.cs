@@ -18,7 +18,7 @@ public class MarchingSquare : MonoBehaviour
     public Vector3[,] verticesStatic = new Vector3[0, 0];
     public MarchingSquarePoint[,] marchingPoints = new MarchingSquarePoint[0, 0];
 
-    public List<MarchingSquarePoint> floodListMarching = new List<MarchingSquarePoint>();
+    public HashSet<MarchingSquarePoint> floodListMarching = new HashSet<MarchingSquarePoint>();
 
 
 
@@ -239,8 +239,6 @@ public class MarchingSquare : MonoBehaviour
             //false means its not been added
 
             coords.Clear();
-
-
             floodListMarching.Clear();
             if (iter > 10)
             {
@@ -264,12 +262,7 @@ public class MarchingSquare : MonoBehaviour
             if (done)
                 break;
 
-            //foreach (var point in marchingPoints)
-            //{
-            //    if (point.weigth >= 0.3f && !point.state) // so its visible
-            //    {
-            //    }
-            //}
+            
 
             var wantedCoord = coords[Random.Range(0, coords.Count)];  //pick a random coord from the choosen ones
 
@@ -355,8 +348,6 @@ public class MarchingSquare : MonoBehaviour
         mesh.name = "Fragment";
 
         mesh.vertices = meshInfor.Item1.ToArray();
-
-
         mesh.triangles = meshInfor.Item2.ToArray();
 
         mesh.RecalculateBounds();
