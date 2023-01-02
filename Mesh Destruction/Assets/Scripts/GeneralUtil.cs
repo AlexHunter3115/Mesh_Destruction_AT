@@ -250,7 +250,7 @@ public static class GeneralUtil
             if (iter > 100)
             {
                 Debug.Log($"exit on the iter");
-                destroy = true;
+                //destroy = true;
                 break;
             }
             iter++;
@@ -394,10 +394,10 @@ public static class GeneralUtil
 
 
 
-        if (destroy)
-        {
-            Debug.Log("<color=red> This iter did not work </color>");
-        }
+        //if (destroy)
+        //{
+        //    Debug.Log("<color=red> This iter did not work </color>");
+        //}
 
         foreach (var tri in triangles)
         {

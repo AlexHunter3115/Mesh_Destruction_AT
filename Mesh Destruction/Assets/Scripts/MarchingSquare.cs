@@ -44,7 +44,9 @@ public class MarchingSquare : MonoBehaviour
     public float minimumWeight = 0.3f;
     [SerializeField]
     public AnimationCurve weightDistribution = new AnimationCurve();
-    //private GameObject OtherWall;
+
+    private MarchingSquare otherWallMarchinSquare;
+    private MeshFilter ownMeshFilter;
 
 
 
@@ -53,6 +55,9 @@ public class MarchingSquare : MonoBehaviour
         //reload = false;
         //genMarch = false;
         CallMarch();
+
+        otherWallMarchinSquare = mirrorWall.GetComponent<MarchingSquare>();
+        ownMeshFilter = this.GetComponent<MeshFilter>();
 
 
         disableGizmos = true;
@@ -141,10 +146,6 @@ public class MarchingSquare : MonoBehaviour
         //}
     }
 
-
-
-    public List<Vector3> verticesStaticList = new List<Vector3>();
-
     //might deete the wall check and just leave it, we could power down the projectile based on the travled distance
   /// <summary>
   /// Call this to receive a shoot to this plane and run the marhching cubes
@@ -156,45 +157,28 @@ public class MarchingSquare : MonoBehaviour
     public void ImpactReceiver(Vector3 impactPoint, float distanceEffect, Vector3 direction, bool wall = false)
     {
 
-        verticesStaticList.Clear();
         foreach (var point in marchingPoints)
         {
             if (Vector3.Distance(impactPoint, point.position) <= distanceEffect)
             {
-                verticesStaticList.Add(transform.position + point.position);
-                // Debug.Log($"This si the pos of a vertex {point.position}");
-
-
-
-
-                //Debug.Log(weightDistribution.Evaluate(Vector3.Distance(impactPoint, point.position)));
                 point.weigth -= weightDistribution.Evaluate(Vector3.Distance(impactPoint, point.position));
-                
-
-
-
-                //point.weigth -= Mathf.Pow(2, -(Vector3.Distance(impactPoint, point.position)) - 0.5f);      
-
-
-
-                // Debug.Log(point.weigth);
-                //if (point.weigth > minimumWeight) 
-                //{
-                //    point.weigth = 0.95f;
-                //}
             }
         }
+
+
         CallMarch();
         FloodFillSetup();
-        mirrorWall.GetComponent<MarchingSquare>().CopyMesh(this.GetComponent<MeshFilter>().mesh);
+
+        otherWallMarchinSquare.CopyMesh(ownMeshFilter.mesh);
+
 
         if (!wall)
         {
             RaycastHit hit;
-            // Does the ray intersect any objects excluding the player layer
+
             if (Physics.Raycast(transform.TransformPoint(impactPoint), direction, out hit, Mathf.Infinity))
             {
-                Debug.DrawRay(transform.TransformPoint(impactPoint), direction * hit.distance, Color.yellow, 20);
+                //Debug.DrawRay(transform.TransformPoint(impactPoint), direction * hit.distance, Color.yellow, 20);
                 if (hit.transform.GetComponent<MarchingSquare>() != null)
                 {
                     GameObject newRef = Instantiate(PlayerScript.instance.bulletPrefab);
@@ -206,10 +190,10 @@ public class MarchingSquare : MonoBehaviour
 
                     marchComp.ImpactReceiver(newRef.transform.localPosition, distanceEffect, direction, true);
                 }
-
             }
         }
     }
+
 
     public void CopyMesh(Mesh meshToCopy) 
     {
@@ -263,8 +247,6 @@ public class MarchingSquare : MonoBehaviour
                 break;
             }
 
-
-
             bool done = true;
 
             foreach (var point in marchingPoints)
@@ -272,7 +254,9 @@ public class MarchingSquare : MonoBehaviour
                 if (!point.state && point.weigth >= 0.3f)
                 {
                     done = false;
-                    break;
+
+                    coords.Add(point.idx);
+                   // break;
                 }
             }
 
@@ -280,15 +264,15 @@ public class MarchingSquare : MonoBehaviour
             if (done)
                 break;
 
-            foreach (var point in marchingPoints)
-            {
-                if (point.weigth >= 0.3f && !point.state) // so its visible
-                {
-                    coords.Add(point.idx);
-                }
-            }
+            //foreach (var point in marchingPoints)
+            //{
+            //    if (point.weigth >= 0.3f && !point.state) // so its visible
+            //    {
+            //    }
+            //}
 
             var wantedCoord = coords[Random.Range(0, coords.Count)];  //pick a random coord from the choosen ones
+
             FloodCall(wantedCoord.x, wantedCoord.y);
 
             if (floodListMarching.Count > 1)
@@ -306,33 +290,39 @@ public class MarchingSquare : MonoBehaviour
                 }
 
 
+
+
                 if (toDel)
                 {
                     var vectorOfVectors = new List<Vector3>();
-                    bool side;
+
+                    int counter = 0;
 
                     foreach (var point in floodListMarching)
                     {
-                        vectorOfVectors.Add(point.position);
 
-                        if (this.transform.localPosition.x > 0)
-                            vectorOfVectors.Add(new Vector3(point.position.x -0.05f, point.position.y, point.position.z));
-                        else
-                            vectorOfVectors.Add(new Vector3(point.position.x +0.05f, point.position.y, point.position.z));
+                        if (point.weigth <= 0.97f) 
+                        {
+                            vectorOfVectors.Add(point.position);
+
+                            if (this.transform.localPosition.x > 0)
+                                vectorOfVectors.Add(new Vector3(point.position.x - 0.05f, point.position.y, point.position.z));
+                            else
+                                vectorOfVectors.Add(new Vector3(point.position.x + 0.05f, point.position.y, point.position.z));
+                        }
+                        else 
+                        {
+                            counter++;
+                        }
 
                         point.weigth = 0;
                     }
-                
-                    if (this.transform.localPosition.x > 0)
-                        side = true;
-                    else
-                        side = false;
+               
 
+                    Debug.Log($"{counter} vertexes were deleted before sending them to the fucntion for optimisation");
+                    FormObject(vectorOfVectors, this.transform.localPosition.x > 0 ? true : false);
 
-                    FormObject(vectorOfVectors,side);
-
-                    //call a fucntion here to take the vertex and create an obj the floodlist has all the vertecies
-                    CallMarch();    // this prob can be put somewhere else so its doesnt call all the time
+                    CallMarch();   
                 }
             }
 
@@ -350,8 +340,12 @@ public class MarchingSquare : MonoBehaviour
 
     public void FormObject(List<Vector3> arrOfVec,bool side)
     {
+
+        if (arrOfVec.Count < 5)
+            return;
+
         var meshInfor = GeneralUtil.IncrementalConvex(arrOfVec);
-        Debug.Log(side);
+
         GameObject newPart = new GameObject();
         newPart.transform.position = this.transform.position;
         newPart.transform.rotation = this.transform.rotation;
@@ -382,9 +376,6 @@ public class MarchingSquare : MonoBehaviour
         var rigidbody = newPart.AddComponent<Rigidbody>();
 
 
-
-        //rigidbody.AddForce(this.transform.up * 5, ForceMode.Impulse);
-
         if (side)
             rigidbody.AddForce(this.transform.right * 2, ForceMode.Impulse);
         else
@@ -393,26 +384,12 @@ public class MarchingSquare : MonoBehaviour
     }
 
 
-
-
-
-
-
-
-
-
-
-
     private void FloodCall(int x, int y)
     {
-
         if (y >= 0 && x >= 0 && y < marchingPoints.GetLength(0) && x < marchingPoints.GetLength(1))
         {
-
-            //Debug.Log($"{marchingPoints[y, x].state} and {marchingPoints[y, x].weigth}  for  {x} and {y}");
             if (!marchingPoints[y, x].state && marchingPoints[y, x].weigth >= 0.3f)
             {
-                //Debug.Log($"{x} and {y} are in hereiurewieriureiuoeriou");
                 marchingPoints[y, x].state = true;
 
                 floodListMarching.Add(marchingPoints[y, x]);
