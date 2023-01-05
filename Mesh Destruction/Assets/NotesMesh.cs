@@ -45,6 +45,13 @@ https://drive.google.com/file/d/1O0d_pqitpgbFYJG06JO6uAJjudI-QHwn/view       htt
  ----------------------------------  TO DO  ----------------------------------
 
 
+
+for some reason the first hit gets reset
+
+BANG OUT VORONOI WHAT WHAT, BUT ITS GOING TO INFILICT WITH THE PERF 
+need checks for perf
+
+
 find a nice asset pack
 
 performance thigns

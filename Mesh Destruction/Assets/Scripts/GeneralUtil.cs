@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
 using Random = UnityEngine.Random;
@@ -412,6 +413,58 @@ public static class GeneralUtil
     
     
     
+    }
+
+
+
+    public static List<Vector3>[] VoronoiDivision(List<Vector3> verticesPoints, int voronoiPoints) 
+    {
+
+        //need to check that the voronoi points isnt larger than the giving vertpoints
+
+
+        List<Vector3> choosenPoints = new List<Vector3>();
+
+
+        while (choosenPoints.Count != voronoiPoints) //decided the points
+        {
+            int ranIdx = Random.Range(0, verticesPoints.Count - 1);
+
+            if (!choosenPoints.Contains(verticesPoints[ranIdx])) 
+                choosenPoints.Add(verticesPoints[ranIdx]);
+
+        }
+
+
+        var listOfVoronoi = new List<Vector3>[choosenPoints.Count];
+        for (int i = 0; i < listOfVoronoi.Length; i++)
+        {
+            listOfVoronoi[i] = new List<Vector3>();
+        }
+
+        foreach (var vertice in verticesPoints)
+        {
+            int closestIDx = 0;
+            float dist = 99999;
+
+            for (int i = 0; i < choosenPoints.Count; i++)
+            {
+                if (Vector3.Distance(choosenPoints[i], vertice) <= dist) 
+                {
+                    dist = Vector3.Distance(choosenPoints[i], vertice);
+                    closestIDx = i;
+                }
+            }
+
+            listOfVoronoi[closestIDx].Add(vertice);
+        }
+
+
+
+
+        return listOfVoronoi;
+
+
     }
 
 

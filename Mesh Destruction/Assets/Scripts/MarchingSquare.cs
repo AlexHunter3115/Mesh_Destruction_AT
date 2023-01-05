@@ -20,7 +20,7 @@ public class MarchingSquare : MonoBehaviour
 
     public HashSet<MarchingSquarePoint> floodListMarching = new HashSet<MarchingSquarePoint>();
 
-
+    public int voronoiNum = 4;
 
     public bool reload;
     public bool genMarch;
@@ -239,13 +239,12 @@ public class MarchingSquare : MonoBehaviour
         while (true)
         {
             //false means its not been added
-            Debug.Log($"ERWIOUERIWUOERWIUOERWIOERIWOUREIUO");
             coords.Clear();
             floodListMarching.Clear();
-            if (iter > 10)
-            {
-                break;
-            }
+            //if (iter > 10)
+            //{
+            //    break;
+            //}
 
             bool done = true;
 
@@ -284,38 +283,67 @@ public class MarchingSquare : MonoBehaviour
                     }
                 }
 
-
-
-
                 if (toDel)
                 {
                     var vectorOfVectors = new List<Vector3>();
 
                     int counter = 0;
 
+
+                    
                     foreach (var point in floodListMarching)
                     {
+                        if (voronoiNum < 2)
+                        {
 
-                        if (point.weigth <= 0.95f) 
+                            if (point.weigth <= 0.95f)
+                            {
+                                vectorOfVectors.Add(point.position);
+
+                                if (this.transform.localPosition.x > 0)
+                                    vectorOfVectors.Add(new Vector3(point.position.x - 0.05f, point.position.y, point.position.z));
+                                else
+                                    vectorOfVectors.Add(new Vector3(point.position.x + 0.05f, point.position.y, point.position.z));
+                            }
+                            else
+                            {
+                                counter++;
+                            }
+                        }
+                        else 
                         {
                             vectorOfVectors.Add(point.position);
-
                             if (this.transform.localPosition.x > 0)
                                 vectorOfVectors.Add(new Vector3(point.position.x - 0.05f, point.position.y, point.position.z));
                             else
                                 vectorOfVectors.Add(new Vector3(point.position.x + 0.05f, point.position.y, point.position.z));
                         }
-                        else 
-                        {
-                            counter++;
-                        }
 
                         point.weigth = 0;
                     }
-               
 
-                    Debug.Log($"{counter} vertexes were deleted before sending them to the fucntion for optimisation");
-                    FormObject(vectorOfVectors, this.transform.localPosition.x > 0 ? true : false);
+                   // Debug.Log($"{vectorOfVectors.Count}");
+                  //  Debug.Log($"{counter} vertexes were deleted before sending them to the fucntion for optimisation");
+
+                    if(voronoiNum > 1) 
+                    {
+                        var voroniOutcome = GeneralUtil.VoronoiDivision(vectorOfVectors, voronoiNum);
+                        //Debug.Log(voroniOutcome.Length);
+                        foreach (var voronoi in voroniOutcome)
+                        {
+                            var increOutcom = GeneralUtil.IncrementalConvex(voronoi);
+
+                            FormObject(increOutcom.Item1, increOutcom.Item2, this.transform.localPosition.x > 0 ? true : false);
+                        }
+                    }
+                    else 
+                    {
+                        var increOutcom = GeneralUtil.IncrementalConvex(vectorOfVectors);
+
+                        FormObject(increOutcom.Item1, increOutcom.Item2, this.transform.localPosition.x > 0 ? true : false);
+                    }
+
+
 
                     CallMarch();   
                 }
@@ -333,13 +361,13 @@ public class MarchingSquare : MonoBehaviour
 
 
 
-    public void FormObject(List<Vector3> arrOfVec,bool side)
+    public void FormObject(List<Vector3> arrOfVec,List<int> tris,bool side)
     {
 
         if (arrOfVec.Count < 5)
             return;
 
-        var meshInfor = GeneralUtil.IncrementalConvex(arrOfVec);
+        //var meshInfor = GeneralUtil.IncrementalConvex(arrOfVec);  // this returns a 
 
         GameObject newPart = new GameObject();
         newPart.transform.position = this.transform.position;
@@ -349,8 +377,8 @@ public class MarchingSquare : MonoBehaviour
         var mesh = new Mesh();
         mesh.name = "Fragment";
 
-        mesh.vertices = meshInfor.Item1.ToArray();
-        mesh.triangles = meshInfor.Item2.ToArray();
+        mesh.vertices = arrOfVec.ToArray();
+        mesh.triangles = tris.ToArray();
 
         mesh.RecalculateBounds();
         mesh.RecalculateNormals();
