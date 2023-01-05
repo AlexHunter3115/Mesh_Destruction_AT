@@ -23,6 +23,8 @@ public class CreateMSQPlanes : MonoBehaviour
     public int resolutionX = 60;
     public int resolutionY = 60;
 
+    public int voronoiNum = 0;
+
     public Material mat;
 
 
@@ -48,12 +50,7 @@ public class CreateMSQPlanes : MonoBehaviour
         innerWall2.AddComponent<MeshCollider>();
         var march = innerWall2.AddComponent<MarchingSquare>();
         march.inner = true;
-        march.mat = mat;
-        march.resolutionX = resolutionX;
-        march.resolutionY = resolutionY;
-
-        march.weightDistribution = weightDistribution;
-        march.weightDistribution = weightDistribution;
+        march.parentScript = this;
 
         march.mirrorWall = outerWall2;
 
@@ -112,12 +109,8 @@ public class CreateMSQPlanes : MonoBehaviour
         innerWall1.AddComponent<MeshFilter>();
         innerWall1.AddComponent<MeshCollider>();
         march = innerWall1.AddComponent<MarchingSquare>();
-        march.resolutionX = resolutionX;
-        march.resolutionY = resolutionY;
-
-        march.weightDistribution = weightDistribution;
+        march.parentScript = this;
         march.inner = false;
-        march.mat = mat;
 
      
         march.mirrorWall = outerWall1;
@@ -176,12 +169,8 @@ public class CreateMSQPlanes : MonoBehaviour
         outerWall1.AddComponent<MeshFilter>();
         outerWall1.AddComponent<MeshCollider>();
         march = outerWall1.AddComponent<MarchingSquare>();
-        march.resolutionX = resolutionX;
-        march.resolutionY = resolutionY;
-
-        march.weightDistribution = weightDistribution;
+        march.parentScript = this;
         march.inner = true;
-        march.mat = mat;
         march.mirrorWall = innerWall1;
 
         outerWall1.transform.localPosition = new Vector3(distance, 0, 0);
@@ -238,13 +227,10 @@ public class CreateMSQPlanes : MonoBehaviour
         outerWall2.AddComponent<MeshFilter>();
         outerWall2.AddComponent<MeshCollider>();
         march = outerWall2.AddComponent<MarchingSquare>();
-        march.resolutionX = resolutionX;
-        march.resolutionY = resolutionY;
         march.mirrorWall = innerWall2;
 
-        march.weightDistribution = weightDistribution;
+        march.parentScript = this;
         march.inner = false;
-        march.mat = mat;
 
         outerWall2.transform.localPosition = new Vector3(-distance, 0, 0);
         outerWall2.layer = LayerMask.NameToLayer("outerWall");

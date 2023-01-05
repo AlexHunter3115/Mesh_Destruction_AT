@@ -10,6 +10,10 @@ public class IncrementalAlgo : MonoBehaviour
 {
 
 
+
+    //to delete
+
+
     public List<Vector3> points = new List<Vector3>();
     public Material mat;
     public List<tetraDeluTrig.Triangle> triangles = new List<tetraDeluTrig.Triangle>();
@@ -22,11 +26,6 @@ public class IncrementalAlgo : MonoBehaviour
     {
         RunIterationAlgo();
     }
-
-
-
-
-
 
 
 
@@ -260,20 +259,6 @@ public class IncrementalAlgo : MonoBehaviour
         points.Clear();
 
     }
-
-
-
-
-
-
-
-    // to check
-    public bool LineIsEqual(tetraDeluTrig.Edge A, tetraDeluTrig.Edge B)
-    {
-        if ((A.edge[0] == B.edge[0] && A.edge[1] == B.edge[1]) || (A.edge[0] == B.edge[1] && A.edge[1] == B.edge[0])) { return true; }
-        else { return false; }
-    }
-
 
 
 

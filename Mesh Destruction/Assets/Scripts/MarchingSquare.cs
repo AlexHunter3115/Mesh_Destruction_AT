@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 
 public class MarchingSquare : MonoBehaviour
@@ -10,40 +8,24 @@ public class MarchingSquare : MonoBehaviour
 
 
 
-
-    public int resolutionX = 40;
-    public int resolutionY = 10;
-
     [SerializeField]
     public Vector3[,] verticesStatic = new Vector3[0, 0];
     public MarchingSquarePoint[,] marchingPoints = new MarchingSquarePoint[0, 0];
 
-    public HashSet<MarchingSquarePoint> floodListMarching = new HashSet<MarchingSquarePoint>();
+    public List<MarchingSquarePoint> floodListMarching = new List<MarchingSquarePoint>();
 
-    public int voronoiNum = 4;
-
-    public bool reload;
-    public bool genMarch;
-
-    public GameObject topLeft;
-    public GameObject topRight;
-    public GameObject botRight;
-    public GameObject botLeft;
-
-    public Material mat;
-    public Material insideMat;
+    //public bool reload;
+    //public bool genMarch;
 
     public bool disableGizmos;
-
-    public float dist = 0.3f;   // inverse square law     // never used
 
     public GameObject mirrorWall;
 
     public bool inner = false;
 
     public float minimumWeight = 0.3f;
-    [SerializeField]
-    public AnimationCurve weightDistribution = new AnimationCurve();
+
+    public CreateMSQPlanes parentScript;
 
     private MarchingSquare otherWallMarchinSquare;
     private MeshFilter ownMeshFilter;
@@ -52,99 +34,14 @@ public class MarchingSquare : MonoBehaviour
 
     private void Start()
     {
-        //reload = false;
-        //genMarch = false;
         CallMarch();
 
         otherWallMarchinSquare = mirrorWall.GetComponent<MarchingSquare>();
         ownMeshFilter = this.GetComponent<MeshFilter>();
 
-
         disableGizmos = true;
-
-        //make 4 objects
-        //OtherWall = new GameObject("otherWall");
-        //OtherWall.transform.parent = this.transform;
-        //OtherWall.AddComponent<MeshRenderer>();
-        //OtherWall.AddComponent<MeshFilter>();
-        ////OtherWall.AddComponent<MeshCollider>();
-
-
-
-        //OtherWall.transform.localPosition = Vector3.zero;
-
-        //if (this.transform.localRotation == Quaternion.Euler(0, 180, 0)) 
-        //{
-        //    OtherWall.transform.localRotation = Quaternion.Euler(0, 0, 0);
-        //}
-
-        //OtherWall.layer = LayerMask.NameToLayer("innerWall");
-       //OtherWall.transform.localRotation = ;
-        //Add Components
-
-
-
-
-
-
     }
 
-
-    private void Update()
-    {
-        //if (reload)
-        //{
-        //    reload = false;
-
-        //    Vector3 topLeftPos = topLeft.transform.localPosition;   //loc
-        //    Vector3 topRightPos = topRight.transform.localPosition;
-        //    Vector3 botLeftPos = botLeft.transform.localPosition;
-        //    Vector3 botRightPos = botRight.transform.localPosition;
-
-        //    verticesStatic = new Vector3[resolutionY + 1, resolutionX + 1];
-
-        //    var yListLeft = new List<Vector3>();
-        //    var yListRight = new List<Vector3>();
-
-        //    for (int i = 0; i < resolutionY + 1; i++)
-        //    {
-        //        float lerpVal = (float)i / (float)resolutionY;
-        //        yListLeft.Add(Vector3.Lerp(topLeftPos, botLeftPos, lerpVal));
-
-        //        yListRight.Add(Vector3.Lerp(topRightPos, botRightPos, lerpVal));
-        //    }
-
-        //    for (int y = 0; y < yListLeft.Count; y++)
-        //    {
-        //        for (int x = 0; x < resolutionX + 1; x++)
-        //        {
-        //            float lerpVal = (float)x / (float)resolutionX;
-        //            verticesStatic[y, x] = Vector3.Lerp(yListLeft[y], yListRight[y], lerpVal);
-        //        }
-        //    }
-
-        //    marchingPoints = new MarchingSquarePoint[resolutionY + 1, resolutionX + 1];
-
-        //    for (int y = 0; y < verticesStatic.GetLength(0); y++)
-        //    {
-        //        for (int x = 0; x < verticesStatic.GetLength(1); x++)
-        //        {
-        //            marchingPoints[y, x] = new MarchingSquarePoint(verticesStatic[y, x], true, 1, new Vector2Int(x, y));
-        //        }
-        //    }
-
-        //    CallMarch();
-
-        //}
-
-
-
-        //if (genMarch)
-        //{
-        //    genMarch = false;
-        //    CallMarch();
-        //}
-    }
 
     //might deete the wall check and just leave it, we could power down the projectile based on the travled distance
   /// <summary>
@@ -161,16 +58,14 @@ public class MarchingSquare : MonoBehaviour
         {
             if (Vector3.Distance(impactPoint, point.position) <= distanceEffect)
             {
-                point.weigth -= weightDistribution.Evaluate(Vector3.Distance(impactPoint, point.position));
+                point.weigth -= parentScript.weightDistribution.Evaluate(Vector3.Distance(impactPoint, point.position));
             }
         }
-
 
         CallMarch();
         FloodFillSetup();
 
         otherWallMarchinSquare.CopyMesh(ownMeshFilter.mesh);
-
 
         if (!wall)
         {
@@ -212,14 +107,13 @@ public class MarchingSquare : MonoBehaviour
         mesh.vertices = meshToCopy.vertices;
         mesh.triangles = arr.ToArray();
 
-        this.GetComponent<MeshRenderer>().material = mat;
+        this.GetComponent<MeshRenderer>().material = parentScript.mat;
         mesh.RecalculateBounds();
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
 
         GetComponent<MeshCollider>().convex = false;
         GetComponent<MeshCollider>().sharedMesh = mesh;
-
     }
 
 
@@ -232,7 +126,7 @@ public class MarchingSquare : MonoBehaviour
             point.state = false;
         }
 
-        int iter = 0;
+        //int iter = 0;
 
         List<Vector2Int> coords = new List<Vector2Int>();
 
@@ -253,9 +147,7 @@ public class MarchingSquare : MonoBehaviour
                 if (!point.state && point.weigth >= 0.3f)
                 {
                     done = false;
-
                     coords.Add(point.idx);
-                   // break;
                 }
             }
 
@@ -263,8 +155,7 @@ public class MarchingSquare : MonoBehaviour
             if (done)
                 break;
 
-            
-
+           
             var wantedCoord = coords[Random.Range(0, coords.Count)];  //pick a random coord from the choosen ones
 
             FloodCall(wantedCoord.x, wantedCoord.y);
@@ -272,7 +163,6 @@ public class MarchingSquare : MonoBehaviour
             if (floodListMarching.Count > 1)
             {
                 bool toDel = true;
-
 
                 foreach (var point in floodListMarching)
                 {
@@ -289,11 +179,9 @@ public class MarchingSquare : MonoBehaviour
 
                     int counter = 0;
 
-
-                    
                     foreach (var point in floodListMarching)
                     {
-                        if (voronoiNum < 2)
+                        if (parentScript.voronoiNum < 2)
                         {
 
                             if (point.weigth <= 0.95f)
@@ -322,13 +210,11 @@ public class MarchingSquare : MonoBehaviour
                         point.weigth = 0;
                     }
 
-                   // Debug.Log($"{vectorOfVectors.Count}");
-                  //  Debug.Log($"{counter} vertexes were deleted before sending them to the fucntion for optimisation");
 
-                    if(voronoiNum > 1) 
+                    if(parentScript.voronoiNum > 1) 
                     {
-                        var voroniOutcome = GeneralUtil.VoronoiDivision(vectorOfVectors, voronoiNum);
-                        //Debug.Log(voroniOutcome.Length);
+                        var voroniOutcome = GeneralUtil.VoronoiDivision(vectorOfVectors, parentScript.voronoiNum);
+                   
                         foreach (var voronoi in voroniOutcome)
                         {
                             var increOutcom = GeneralUtil.IncrementalConvex(voronoi);
@@ -349,8 +235,7 @@ public class MarchingSquare : MonoBehaviour
                 }
             }
 
-
-            iter++;
+            //iter++;
         }
     }
 
@@ -366,8 +251,6 @@ public class MarchingSquare : MonoBehaviour
 
         if (arrOfVec.Count < 5)
             return;
-
-        //var meshInfor = GeneralUtil.IncrementalConvex(arrOfVec);  // this returns a 
 
         GameObject newPart = new GameObject();
         newPart.transform.position = this.transform.position;
@@ -437,9 +320,9 @@ public class MarchingSquare : MonoBehaviour
         List<int> trianglesList = new List<int>();
 
 
-        for (int y = 0; y < resolutionY; y++)
+        for (int y = 0; y < parentScript.resolutionY; y++)
         {
-            for (int x = 0; x < resolutionX; x++)
+            for (int x = 0; x < parentScript.resolutionX; x++)
             {
 
                 int binary = 0;
@@ -479,7 +362,7 @@ public class MarchingSquare : MonoBehaviour
         mesh.triangles = trianglesList.ToArray();
 
 
-        this.GetComponent<MeshRenderer>().material = mat;
+        this.GetComponent<MeshRenderer>().material = parentScript.mat;
         mesh.RecalculateBounds();
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
@@ -489,10 +372,7 @@ public class MarchingSquare : MonoBehaviour
 
     }
 
-
     //altought here might not be like alot of tri, the arry only takes i think 60k but i am giving it 80k so need to figrue out a way
-
-
 
     private List<Vector3> DrawOrder(int activated, MarchingSquarePoint topLeft, MarchingSquarePoint topRight, MarchingSquarePoint botLeft, MarchingSquarePoint botRight)
     {
@@ -723,7 +603,6 @@ public class MarchingSquare : MonoBehaviour
                 Gizmos.DrawSphere(vertex, 0.01f);
             }
         }
-
     }
 }
 
