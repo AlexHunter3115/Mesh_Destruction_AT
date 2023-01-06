@@ -62,10 +62,6 @@ public class MarchingSquare : MonoBehaviour
             }
         }
 
-        CallMarch();
-        FloodFillSetup();
-
-        otherWallMarchinSquare.CopyMesh(ownMeshFilter.mesh);
 
         if (!wall)
         {
@@ -87,7 +83,38 @@ public class MarchingSquare : MonoBehaviour
                 }
             }
         }
+
+
+        //CallMarch();
+        //FloodFillSetup();
+
+        //otherWallMarchinSquare.CopyMesh(ownMeshFilter.mesh);
+
+        StartCoroutine(MarchCo());
+
+
+        
     }
+
+
+    private IEnumerator MarchCo()
+    {
+
+
+        CallMarch();
+
+        FloodFillSetup();
+
+
+        otherWallMarchinSquare.CopyMesh(ownMeshFilter.mesh);
+
+
+        yield return null;
+    }
+
+
+
+
 
 
     public void CopyMesh(Mesh meshToCopy) 

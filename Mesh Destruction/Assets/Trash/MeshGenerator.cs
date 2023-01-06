@@ -1,10 +1,5 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static DeluTrig;
-using static UnityEngine.EventSystems.EventTrigger;
-using static UnityEngine.UI.Image;
 
 
 [RequireComponent(typeof(MeshFilter))]

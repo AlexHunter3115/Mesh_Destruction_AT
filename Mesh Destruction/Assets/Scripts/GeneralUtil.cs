@@ -79,6 +79,11 @@ public static class GeneralUtil
 
             int randomIndex = Random.Range(0, points.Count-1);
 
+            if(randomIndex <= 0) 
+            {
+                break;
+            }
+
             List<int> interestedTris = new List<int>();
 
 

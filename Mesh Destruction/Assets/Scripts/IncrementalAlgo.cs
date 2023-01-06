@@ -3,20 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using UnityEditor;
-using Newtonsoft.Json.Linq;
-using System.Linq;
 
 public class IncrementalAlgo : MonoBehaviour
 {
 
 
-
+    /*
     //to delete
 
 
     public List<Vector3> points = new List<Vector3>();
     public Material mat;
-    public List<tetraDeluTrig.Triangle> triangles = new List<tetraDeluTrig.Triangle>();
+    public List<Triangle> triangles = new List<Tr>();
 
 
     public bool test = false;
@@ -246,7 +244,7 @@ public class IncrementalAlgo : MonoBehaviour
             triangleIndex.Add(vertex.Count);
             vertex.Add(tri.c);
         }
-        */
+        
 
 
         mesh.vertices = results.Item1.ToArray();
@@ -257,6 +255,7 @@ public class IncrementalAlgo : MonoBehaviour
 
         this.GetComponent<MeshRenderer>().material = mat;
         points.Clear();
+      
 
     }
 
@@ -293,5 +292,5 @@ public class IncrementalAlgo : MonoBehaviour
         //    }
         //}
     }
-
+      */
 }
