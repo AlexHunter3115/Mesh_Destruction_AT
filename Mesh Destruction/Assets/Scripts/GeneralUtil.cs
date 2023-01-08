@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
+using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
 public static class GeneralUtil
@@ -18,11 +20,9 @@ public static class GeneralUtil
     /// <returns>first is the vertices then the tringles index</returns>
     public static Tuple<List<Vector3>, List<int>> IncrementalConvex(List<Vector3> points) 
     {
+        Stopwatch st = new Stopwatch();
+        st.Start();
 
-        int time = Environment.TickCount & Int32.MaxValue;
-
-
-        Debug.Log(points.Count);
 
         var vertecies = new List<Vector3>();
         var triangle = new List<int>();
@@ -183,13 +183,6 @@ public static class GeneralUtil
         }
 
 
-
-
-        //if (destroy)
-        //{
-        //    Debug.Log("<color=red> This iter did not work </color>");
-        //}
-
         foreach (var tri in triangles)
         {
             triangle.Add(vertecies.Count);
@@ -201,27 +194,18 @@ public static class GeneralUtil
         }
 
 
+        st.Stop();
 
 
-
-
-        int timerEnd = Environment.TickCount & Int32.MaxValue;
-
-        Debug.Log($"<color=yellow>Performance: This operation took {timerEnd - time} ticks</color>");
-
-
+        Debug.Log($"<color=yellow>Performance: Convex hull for {points.Count} points took {st.ElapsedMilliseconds} milliseconds</color>");
 
         return Tuple.Create(vertecies, triangle);
-    
-    
-    
     }
-
-
 
     public static List<Vector3>[] VoronoiDivision(List<Vector3> verticesPoints, int voronoiPoints) 
     {
-
+        Stopwatch st = new Stopwatch();
+        st.Start();
         //need to check that the voronoi points isnt larger than the giving vertpoints
 
 
@@ -262,12 +246,16 @@ public static class GeneralUtil
         }
 
 
+        st.Stop();
+        Debug.Log($"<color=yellow>Performance: voronoi operation for {verticesPoints.Count} with number of {voronoiPoints} divisions took {st.ElapsedMilliseconds} milliseconds</color>");
 
 
         return listOfVoronoi;
 
 
     }
+
+
 
 
     public class Triangle
@@ -310,7 +298,6 @@ public static class GeneralUtil
         }
 
     }
-
 
     public static bool LineIsEqual(Edge A, Edge B)
     {

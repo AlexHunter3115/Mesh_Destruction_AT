@@ -161,8 +161,8 @@ MonoBehaviour:
   outerWall1: {fileID: 0}
   innerWall1: {fileID: 0}
   distance: 0.1
-  resolutionX: 50
-  resolutionY: 30
+  resolutionX: 60
+  resolutionY: 60
   voronoiNum: 5
   mat: {fileID: 2100000, guid: 180a2a1a2ffebed4a9dc3f38592a45f6, type: 2}
   weightDistribution:

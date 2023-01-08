@@ -1,13 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
+using Random = UnityEngine.Random;
 
 public class MarchingSquare : MonoBehaviour
 {
-
-
-
     [SerializeField]
     public Vector3[,] verticesStatic = new Vector3[0, 0];
     public MarchingSquarePoint[,] marchingPoints = new MarchingSquarePoint[0, 0];
@@ -54,6 +55,12 @@ public class MarchingSquare : MonoBehaviour
     public void ImpactReceiver(Vector3 impactPoint, float distanceEffect, Vector3 direction, bool wall = false)
     {
 
+        marchingPoints = otherWallMarchinSquare.marchingPoints;
+
+        Debug.Log($"-----------------------------\n--------------------------\n\n");
+
+        Stopwatch st = new Stopwatch();
+        st.Start();
         foreach (var point in marchingPoints)
         {
             if (Vector3.Distance(impactPoint, point.position) <= distanceEffect)
@@ -85,15 +92,15 @@ public class MarchingSquare : MonoBehaviour
         }
 
 
-        //CallMarch();
-        //FloodFillSetup();
+        CallMarch();
+        FloodFillSetup();
 
-        //otherWallMarchinSquare.CopyMesh(ownMeshFilter.mesh);
+        otherWallMarchinSquare.CopyMesh(ownMeshFilter.mesh);
 
-        StartCoroutine(MarchCo());
+        //StartCoroutine(MarchCo());
+        st.Stop();
 
-
-        
+        Debug.Log($"<color=red>Performance: OVERALL operation took {st.ElapsedMilliseconds} ticks</color>");
     }
 
 
@@ -113,41 +120,13 @@ public class MarchingSquare : MonoBehaviour
     }
 
 
-
-
-
-
-    public void CopyMesh(Mesh meshToCopy) 
-    {
-        Mesh mesh = GetComponent<MeshFilter>().mesh;
-
-        otherWallMarchinSquare.marchingPoints = marchingPoints;
-
-        mesh.Clear();
-
-        mesh.indexFormat = meshToCopy.indexFormat;
-
-        var arr = meshToCopy.triangles.ToList();
-
-        arr.Reverse();
-
-        mesh.vertices = meshToCopy.vertices;
-        mesh.triangles = arr.ToArray();
-
-        this.GetComponent<MeshRenderer>().material = parentScript.mat;
-        mesh.RecalculateBounds();
-        mesh.RecalculateNormals();
-        mesh.RecalculateTangents();
-
-        GetComponent<MeshCollider>().convex = false;
-        GetComponent<MeshCollider>().sharedMesh = mesh;
-    }
-
-
-
-
     private void FloodFillSetup()
     {
+
+        Stopwatch st = new Stopwatch();
+        st.Start();
+
+
         foreach (var point in marchingPoints)
         {
             point.state = false;
@@ -264,57 +243,12 @@ public class MarchingSquare : MonoBehaviour
 
             //iter++;
         }
-    }
 
+        st.Stop();
 
-
-
-
-
-
-
-    public void FormObject(List<Vector3> arrOfVec,List<int> tris,bool side)
-    {
-
-        if (arrOfVec.Count < 5)
-            return;
-
-        GameObject newPart = new GameObject();
-        newPart.transform.position = this.transform.position;
-        newPart.transform.rotation = this.transform.rotation;
-        newPart.transform.localScale = this.transform.localScale;
-
-        var mesh = new Mesh();
-        mesh.name = "Fragment";
-
-        mesh.vertices = arrOfVec.ToArray();
-        mesh.triangles = tris.ToArray();
-
-        mesh.RecalculateBounds();
-        mesh.RecalculateNormals();
-        mesh.RecalculateTangents();
-
-
-        var renderer = newPart.AddComponent<MeshRenderer>();
-        renderer.materials = this.GetComponent<MeshRenderer>().materials;
-
-        var filter = newPart.AddComponent<MeshFilter>();
-        filter.mesh = mesh;
-
-        var collider = newPart.AddComponent<MeshCollider>();
-        collider.convex = true;
-
-        var rigidbody = newPart.AddComponent<Rigidbody>();
-
-
-        if (side)
-            rigidbody.AddForce(this.transform.right * 2, ForceMode.Impulse);
-        else
-            rigidbody.AddForce(this.transform.right * -2, ForceMode.Impulse);
+        Debug.Log($"<color=yellow>Performance: flood fill operation took {st.ElapsedMilliseconds} milliseconds</color>");
 
     }
-
-
     private void FloodCall(int x, int y)
     {
         if (y >= 0 && x >= 0 && y < marchingPoints.GetLength(0) && x < marchingPoints.GetLength(1))
@@ -334,10 +268,10 @@ public class MarchingSquare : MonoBehaviour
     }
 
 
-
-
     private void CallMarch()
     {
+        Stopwatch st = new Stopwatch();
+        st.Start();
 
         Mesh mesh = GetComponent<MeshFilter>().mesh;
 
@@ -397,7 +331,86 @@ public class MarchingSquare : MonoBehaviour
         GetComponent<MeshCollider>().convex = false;
         GetComponent<MeshCollider>().sharedMesh = mesh;
 
+
+        st.Stop();
+
+        Debug.Log($"<color=yellow>Performance: call march operation took {st.ElapsedMilliseconds} milliseconds</color>");
+
+
+
+
     }
+
+
+    public void CopyMesh(Mesh meshToCopy)
+    {
+
+        Mesh mesh = GetComponent<MeshFilter>().mesh;
+
+        //otherWallMarchinSquare.marchingPoints = marchingPoints;
+
+        mesh.Clear();
+
+        mesh.indexFormat = meshToCopy.indexFormat;
+
+        var arr = meshToCopy.triangles.ToList();
+
+        arr.Reverse();
+
+        mesh.vertices = meshToCopy.vertices;
+        mesh.triangles = arr.ToArray();
+
+        this.GetComponent<MeshRenderer>().material = parentScript.mat;
+        mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
+        mesh.RecalculateTangents();
+
+        GetComponent<MeshCollider>().convex = false;
+        GetComponent<MeshCollider>().sharedMesh = mesh;
+    }
+
+    public void FormObject(List<Vector3> arrOfVec, List<int> tris, bool side)
+    {
+
+        if (arrOfVec.Count < 5)
+            return;
+
+        GameObject newPart = new GameObject();
+        newPart.transform.position = this.transform.position;
+        newPart.transform.rotation = this.transform.rotation;
+        newPart.transform.localScale = this.transform.localScale;
+
+        var mesh = new Mesh();
+        mesh.name = "Fragment";
+
+        mesh.vertices = arrOfVec.ToArray();
+        mesh.triangles = tris.ToArray();
+
+        mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
+        mesh.RecalculateTangents();
+
+
+        var renderer = newPart.AddComponent<MeshRenderer>();
+        renderer.materials = this.GetComponent<MeshRenderer>().materials;
+
+        var filter = newPart.AddComponent<MeshFilter>();
+        filter.mesh = mesh;
+
+        var collider = newPart.AddComponent<MeshCollider>();
+        collider.convex = true;
+
+        var rigidbody = newPart.AddComponent<Rigidbody>();
+
+
+        if (side)
+            rigidbody.AddForce(this.transform.right * 2, ForceMode.Impulse);
+        else
+            rigidbody.AddForce(this.transform.right * -2, ForceMode.Impulse);
+
+    }
+
+
 
     //altought here might not be like alot of tri, the arry only takes i think 60k but i am giving it 80k so need to figrue out a way
 

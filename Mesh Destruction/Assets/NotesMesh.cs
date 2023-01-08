@@ -44,17 +44,14 @@ https://drive.google.com/file/d/1O0d_pqitpgbFYJG06JO6uAJjudI-QHwn/view       htt
 
  ----------------------------------  TO DO  ----------------------------------
 
-
+added perf checks and for somereason now nothing lags, there are some stutters but idk
+in case it gets bad add compartimentalisation similar to the python asteroi thing
 
 for some reason the first hit gets reset
 
-BANG OUT VORONOI WHAT WHAT, BUT ITS GOING TO INFILICT WITH THE PERF 
-need checks for perf
 
 
 find a nice asset pack
-
-performance thigns
 
 
 Game idea - i was thinking zombies tbh, the zombies walk to the window, break it
