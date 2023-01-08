@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
@@ -14,6 +15,7 @@ public class PlayerScript : MonoBehaviour
     private InputAction move;
     private InputAction look;
     private InputAction shoot;
+    private InputAction reload;
 
 
     //private PlayerInput.PlayerActions playerActions;
@@ -44,6 +46,8 @@ public class PlayerScript : MonoBehaviour
     public float distanceEffect = 0.7f;
 
     public GameObject effect;
+    private Animator animCont;
+    private Vector3 mLastPosition;
 
     private void Awake()
     {
@@ -54,6 +58,7 @@ public class PlayerScript : MonoBehaviour
         //playerInput = GetComponent<PlayerInput>();
         //playerInput.playerActions.Movement.performed += ProcessMove;
 
+        animCont = GetComponent<Animator>();
 
         controller = GetComponent<CharacterController>();
       
@@ -64,13 +69,16 @@ public class PlayerScript : MonoBehaviour
         move = playerInput.playerActions.Movement;
         look = playerInput.playerActions.Look;
         shoot = playerInput.playerActions.Shoot;
+        reload = playerInput.playerActions.Reload;
 
 
         move.Enable();
         look.Enable();
         shoot.Enable();
+        reload.Enable();
 
         shoot.performed += ShootingRayCastManager;
+        reload.performed += ReloadGun;
     }
 
     private void OnDisable()
@@ -78,6 +86,7 @@ public class PlayerScript : MonoBehaviour
         move.Disable();
         look.Disable();
         shoot.Disable();
+        reload.Disable();
     }
 
 
@@ -87,7 +96,6 @@ public class PlayerScript : MonoBehaviour
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
-       
     }
 
 
@@ -110,7 +118,10 @@ public class PlayerScript : MonoBehaviour
     }
 
 
-
+    public void ReloadGun(InputAction.CallbackContext context) 
+    {
+        animCont.SetTrigger("reload");
+    }
 
 
     public void ShootingRayCastManager(InputAction.CallbackContext context)
@@ -120,8 +131,9 @@ public class PlayerScript : MonoBehaviour
 
         Vector3 newDir = Camera.main.transform.TransformDirection(new Vector3(x, y, 1));
 
-        if (Time.time > lastFire + fireRate)
+        if (Time.time > lastFire + fireRate  && !animCont.GetCurrentAnimatorStateInfo(0).IsName("Rig|AK_Shot") && !animCont.GetCurrentAnimatorStateInfo(0).IsName("Rig|AK_Reload"))
         {
+            animCont.SetTrigger("shoot");
 
             lastFire = Time.time;
             RaycastHit outHit;
@@ -185,9 +197,12 @@ public class PlayerScript : MonoBehaviour
 
     private void FixedUpdate()
     {
-
         ProcessMove(move.ReadValue<Vector2>());
 
+        float speed = (transform.position - mLastPosition).magnitude / Time.deltaTime;
+        mLastPosition = transform.position;
+
+        animCont.SetFloat("speed", speed);
     }
 
 
