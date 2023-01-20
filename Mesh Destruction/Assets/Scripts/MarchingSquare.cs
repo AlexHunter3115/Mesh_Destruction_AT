@@ -32,7 +32,6 @@ public class MarchingSquare : MonoBehaviour
     private MeshFilter ownMeshFilter;
 
 
-
     private void Start()
     {
         CallMarch();
@@ -41,6 +40,7 @@ public class MarchingSquare : MonoBehaviour
         ownMeshFilter = this.GetComponent<MeshFilter>();
 
         disableGizmos = true;
+
     }
 
 
@@ -57,10 +57,17 @@ public class MarchingSquare : MonoBehaviour
 
         marchingPoints = otherWallMarchinSquare.marchingPoints;
 
-        Debug.Log($"-----------------------------\n--------------------------\n\n");
+        Debug.Log($"-------------------------------------------------------\n\n");
 
         Stopwatch st = new Stopwatch();
         st.Start();
+
+
+
+
+
+
+
         foreach (var point in marchingPoints)
         {
             if (Vector3.Distance(impactPoint, point.position) <= distanceEffect)
@@ -97,26 +104,9 @@ public class MarchingSquare : MonoBehaviour
 
         otherWallMarchinSquare.CopyMesh(ownMeshFilter.mesh);
 
-        //StartCoroutine(MarchCo());
         st.Stop();
 
-        Debug.Log($"<color=red>Performance: OVERALL operation took {st.ElapsedMilliseconds} ticks</color>");
-    }
-
-
-    private IEnumerator MarchCo()
-    {
-
-
-        CallMarch();
-
-        FloodFillSetup();
-
-
-        otherWallMarchinSquare.CopyMesh(ownMeshFilter.mesh);
-
-
-        yield return null;
+       // Debug.Log($"<color=red>Performance: OVERALL operation took {st.ElapsedMilliseconds} ticks</color>");
     }
 
 
@@ -246,7 +236,7 @@ public class MarchingSquare : MonoBehaviour
 
         st.Stop();
 
-        Debug.Log($"<color=yellow>Performance: flood fill operation took {st.ElapsedMilliseconds} milliseconds</color>");
+        //Debug.Log($"<color=yellow>Performance: flood fill operation took {st.ElapsedMilliseconds} milliseconds</color>");
 
     }
     private void FloodCall(int x, int y)
@@ -334,7 +324,7 @@ public class MarchingSquare : MonoBehaviour
 
         st.Stop();
 
-        Debug.Log($"<color=yellow>Performance: call march operation took {st.ElapsedMilliseconds} milliseconds</color>");
+        //Debug.Log($"<color=yellow>Performance: call march operation took {st.ElapsedMilliseconds} milliseconds</color>");
 
 
 
@@ -393,6 +383,18 @@ public class MarchingSquare : MonoBehaviour
 
         var renderer = newPart.AddComponent<MeshRenderer>();
         renderer.materials = this.GetComponent<MeshRenderer>().materials;
+
+        if (parentScript.typeOfFragElimination) 
+        {
+            var delPart =  newPart.AddComponent<ShrinkOnCol>();
+            delPart.dissapearTimer = parentScript.fragElimTimer;
+        }
+        else 
+        {
+            var delPart = newPart.AddComponent<DelColOnCol>();
+            delPart.dissapearTimer = parentScript.fragElimTimer;
+        }
+
 
         var filter = newPart.AddComponent<MeshFilter>();
         filter.mesh = mesh;
@@ -638,12 +640,11 @@ public class MarchingSquare : MonoBehaviour
 
         if (!disableGizmos)
         {
-            foreach (var vertex in verticesStatic)
-            {
-                Gizmos.DrawSphere(vertex, 0.01f);
-            }
         }
     }
+
+
+
 }
 
 
@@ -656,6 +657,7 @@ public class MarchingSquarePoint
     public bool state;
     public float weigth;
     public Vector2Int idx;
+    public int chunkIdx;
 
 
     public MarchingSquarePoint(Vector3 _position, bool _state, float _weight, Vector2Int _idx)

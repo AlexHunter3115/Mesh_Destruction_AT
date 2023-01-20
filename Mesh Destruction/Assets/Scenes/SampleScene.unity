@@ -165,6 +165,7 @@ MonoBehaviour:
   resolutionY: 60
   voronoiNum: 5
   mat: {fileID: 2100000, guid: 180a2a1a2ffebed4a9dc3f38592a45f6, type: 2}
+  typeOfFragElimination: 0
   weightDistribution:
     serializedVersion: 2
     m_Curve:
@@ -232,7 +233,7 @@ GameObject:
   - component: {fileID: 286971238}
   - component: {fileID: 286971237}
   m_Layer: 0
-  m_Name: Cube (2)
+  m_Name: RightPost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -427,7 +428,7 @@ GameObject:
   - component: {fileID: 440126109}
   - component: {fileID: 440126108}
   m_Layer: 0
-  m_Name: Cube (1)
+  m_Name: LeftPost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -951,7 +952,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   bulletPrefab: {fileID: 8601563077649812370, guid: fb14d7ba4403e6f46aab66248f09c0a3, type: 3}
-  fireRate: 0.1
+  fireRate: 0.03
   lastFire: 0
   inaccuracy: 0.1
   distanceEffect: 0.4

@@ -131,7 +131,7 @@ public class PlayerScript : MonoBehaviour
 
         Vector3 newDir = Camera.main.transform.TransformDirection(new Vector3(x, y, 1));
 
-        if (Time.time > lastFire + fireRate  && !animCont.GetCurrentAnimatorStateInfo(0).IsName("Rig|AK_Shot") && !animCont.GetCurrentAnimatorStateInfo(0).IsName("Rig|AK_Reload"))
+        if (Time.time > lastFire + fireRate  && !animCont.GetCurrentAnimatorStateInfo(0).IsName("Rig|AK_Reload"))    //&& !animCont.GetCurrentAnimatorStateInfo(0).IsName("Rig|AK_Shot") &&
         {
             animCont.SetTrigger("shoot");
 

@@ -28,6 +28,10 @@ public class CreateMSQPlanes : MonoBehaviour
     public Material mat;
 
 
+    [Tooltip("True for shrinking animation, False for fall through the ground")]
+    public bool typeOfFragElimination;
+    public float fragElimTimer = 2;
+
     /// <summary>
     /// x is distance 
     /// and the y is the damage
@@ -40,11 +44,11 @@ public class CreateMSQPlanes : MonoBehaviour
     void Start()
     {
 
-
         #region innerWall2
 
         innerWall2 = new GameObject("innerWall2");
         innerWall2.transform.parent = this.transform;
+        
         innerWall2.AddComponent<MeshRenderer>();
         innerWall2.AddComponent<MeshFilter>();
         innerWall2.AddComponent<MeshCollider>();
@@ -58,6 +62,10 @@ public class CreateMSQPlanes : MonoBehaviour
         innerWall2.layer = LayerMask.NameToLayer("innerWall");
 
 
+        //Vector3 topLeftPos = this.transform.TransformPoint(topLeft.transform.position);
+        //Vector3 topRightPos = this.transform.TransformPoint(topRight.transform.position);
+        //Vector3 botLeftPos = this.transform.TransformPoint(botLeft.transform.position);
+        //Vector3 botRightPos = this.transform.TransformPoint(botRight.transform.position);
 
         Vector3 topLeftPos = topLeft.transform.localPosition;   //loc
         Vector3 topRightPos = topRight.transform.localPosition ;
@@ -96,8 +104,9 @@ public class CreateMSQPlanes : MonoBehaviour
             }
         }
 
-        #endregion
+        innerWall2.transform.rotation = new Quaternion(0,0,0,0);
 
+        #endregion
 
 
 
@@ -156,8 +165,8 @@ public class CreateMSQPlanes : MonoBehaviour
             }
         }
 
+        innerWall1.transform.rotation = new Quaternion(0, 0, 0, 0);
         #endregion
-
 
 
 
@@ -213,9 +222,10 @@ public class CreateMSQPlanes : MonoBehaviour
             }
         }
 
+
+        outerWall1.transform.rotation = new Quaternion(0, 0, 0, 0);
+
         #endregion
-
-
 
 
 
@@ -273,13 +283,15 @@ public class CreateMSQPlanes : MonoBehaviour
             }
         }
 
+
+
+        outerWall2.transform.rotation = new Quaternion(0, 0, 0, 0);
+
         #endregion
 
 
 
-
-
-         march = innerWall2.GetComponent<MarchingSquare>();
+        march = innerWall2.GetComponent<MarchingSquare>();
         march.mirrorWall = outerWall2;
 
 

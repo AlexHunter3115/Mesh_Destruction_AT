@@ -45,10 +45,6 @@ https://drive.google.com/file/d/1O0d_pqitpgbFYJG06JO6uAJjudI-QHwn/view       htt
  ----------------------------------  TO DO  ----------------------------------
 
 added perf checks and for somereason now nothing lags, there are some stutters but idk
-in case it gets bad add compartimentalisation similar to the python asteroi thing
-
-for some reason the first hit gets reset
-
 
 
 find a nice asset pack
@@ -58,5 +54,5 @@ Game idea - i was thinking zombies tbh, the zombies walk to the window, break it
 
 window can be repaired, if each "wall" holds a que of a list of vectors then i can just call the vectors from the latets destoyed and replenish them
 
-
+make the signals a child of the post so they move together
  */
