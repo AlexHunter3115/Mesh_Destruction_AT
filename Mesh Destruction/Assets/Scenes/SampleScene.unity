@@ -163,9 +163,10 @@ MonoBehaviour:
   distance: 0.1
   resolutionX: 60
   resolutionY: 60
-  voronoiNum: 5
+  voronoiNum: 0
   mat: {fileID: 2100000, guid: 180a2a1a2ffebed4a9dc3f38592a45f6, type: 2}
   typeOfFragElimination: 0
+  fragElimTimer: 7
   weightDistribution:
     serializedVersion: 2
     m_Curve:
@@ -1033,7 +1034,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1415114515}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -6.05, z: 0}
+  m_LocalPosition: {x: 0, y: -6.05, z: 0.26}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1256,7 +1257,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1762902479}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 3}
+  m_LocalPosition: {x: -2.14, y: 2.34, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1287,7 +1288,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2021346576}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -2, z: 3}
+  m_LocalPosition: {x: 1.3, y: -1.6599998, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

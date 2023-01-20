@@ -141,7 +141,6 @@ public class PlayerScript : MonoBehaviour
             {
                 if (outHit.transform.GetComponent<MarchingSquare>() != null)
                 {
-
                     GameObject newRef = Instantiate(bulletPrefab);
 
                     newRef.transform.position = outHit.point;

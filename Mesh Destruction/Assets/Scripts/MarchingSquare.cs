@@ -83,7 +83,7 @@ public class MarchingSquare : MonoBehaviour
 
             if (Physics.Raycast(transform.TransformPoint(impactPoint), direction, out hit, Mathf.Infinity))
             {
-                //Debug.DrawRay(transform.TransformPoint(impactPoint), direction * hit.distance, Color.yellow, 20);
+                //Debug.DrawRay(transform.TransformPoint(impactPoint), direction * hit.distance, Color.green, 20);
                 if (hit.transform.GetComponent<MarchingSquare>() != null)
                 {
                     GameObject newRef = Instantiate(PlayerScript.instance.bulletPrefab);

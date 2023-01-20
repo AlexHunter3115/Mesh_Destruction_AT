@@ -44,6 +44,8 @@ https://drive.google.com/file/d/1O0d_pqitpgbFYJG06JO6uAJjudI-QHwn/view       htt
 
  ----------------------------------  TO DO  ----------------------------------
 
+whya re there 4 vertecies there should be only 2 4 is a pain
+
 added perf checks and for somereason now nothing lags, there are some stutters but idk
 
 
