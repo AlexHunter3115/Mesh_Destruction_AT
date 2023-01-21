@@ -15,9 +15,6 @@ public class MarchingSquare : MonoBehaviour
 
     public List<MarchingSquarePoint> floodListMarching = new List<MarchingSquarePoint>();
 
-    //public bool reload;
-    //public bool genMarch;
-
     public bool disableGizmos;
 
     public GameObject mirrorWall;
@@ -52,27 +49,20 @@ public class MarchingSquare : MonoBehaviour
   /// <param name="distanceEffect"></param>
   /// <param name="direction"></param>
   /// <param name="wall">false if its needs to propegate</param>
-    public void ImpactReceiver(Vector3 impactPoint, float distanceEffect, Vector3 direction, bool wall = false)
+    public void ImpactReceiver(Vector3 impactPoint, float distanceEffect, Vector3 direction,float multi, AnimationCurve graph, bool wall = false)
     {
 
         marchingPoints = otherWallMarchinSquare.marchingPoints;
 
-        Debug.Log($"-------------------------------------------------------\n\n");
-
         Stopwatch st = new Stopwatch();
         st.Start();
-
-
-
-
-
 
 
         foreach (var point in marchingPoints)
         {
             if (Vector3.Distance(impactPoint, point.position) <= distanceEffect)
             {
-                point.weigth -= parentScript.weightDistribution.Evaluate(Vector3.Distance(impactPoint, point.position));
+                point.weigth -= (graph.Evaluate(Vector3.Distance(impactPoint, point.position))) * multi;
             }
         }
 
@@ -83,7 +73,7 @@ public class MarchingSquare : MonoBehaviour
 
             if (Physics.Raycast(transform.TransformPoint(impactPoint), direction, out hit, Mathf.Infinity))
             {
-                //Debug.DrawRay(transform.TransformPoint(impactPoint), direction * hit.distance, Color.green, 20);
+                Debug.DrawRay(transform.TransformPoint(impactPoint), direction * hit.distance, Color.green, 50);
                 if (hit.transform.GetComponent<MarchingSquare>() != null)
                 {
                     GameObject newRef = Instantiate(PlayerScript.instance.bulletPrefab);
@@ -93,7 +83,7 @@ public class MarchingSquare : MonoBehaviour
 
                     var marchComp = hit.transform.GetComponent<MarchingSquare>();
 
-                    marchComp.ImpactReceiver(newRef.transform.localPosition, distanceEffect, direction, true);
+                    marchComp.ImpactReceiver(newRef.transform.localPosition, distanceEffect, direction,multi * parentScript.energyLossMultiplier, graph, true);
                 }
             }
         }

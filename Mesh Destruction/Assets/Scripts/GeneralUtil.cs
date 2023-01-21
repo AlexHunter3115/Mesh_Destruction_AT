@@ -43,7 +43,7 @@ public static class GeneralUtil
 
 
         int iter = 0;
-        bool destroy = false;
+        //bool destroy = false;
 
 
         while (points.Count > 1)

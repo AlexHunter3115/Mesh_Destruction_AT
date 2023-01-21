@@ -20,6 +20,9 @@ public class CreateMSQPlanes : MonoBehaviour
 
     public float distance = 0.1f;
 
+    [Range(0.1f,0.95f)]
+    public float energyLossMultiplier;
+
     public int resolutionX = 60;
     public int resolutionY = 60;
 
@@ -36,8 +39,8 @@ public class CreateMSQPlanes : MonoBehaviour
     /// x is distance 
     /// and the y is the damage
     /// </summary>
-    [SerializeField]
-    public AnimationCurve weightDistribution = new AnimationCurve();
+    //[SerializeField]
+    //public AnimationCurve weightDistribution = new AnimationCurve();
 
 
     // Start is called before the first frame update
@@ -60,12 +63,6 @@ public class CreateMSQPlanes : MonoBehaviour
 
         innerWall2.transform.localPosition =  new Vector3(-distance,0,0);
         innerWall2.layer = LayerMask.NameToLayer("innerWall");
-
-
-        //Vector3 topLeftPos = this.transform.TransformPoint(topLeft.transform.position);
-        //Vector3 topRightPos = this.transform.TransformPoint(topRight.transform.position);
-        //Vector3 botLeftPos = this.transform.TransformPoint(botLeft.transform.position);
-        //Vector3 botRightPos = this.transform.TransformPoint(botRight.transform.position);
 
         Vector3 topLeftPos = topLeft.transform.localPosition;   //loc
         Vector3 topRightPos = topRight.transform.localPosition ;

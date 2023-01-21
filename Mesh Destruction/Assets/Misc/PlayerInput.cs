@@ -62,6 +62,15 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Ability"",
+                    ""type"": ""Button"",
+                    ""id"": ""451f8dc6-9572-4459-b6b8-c4f41ce70319"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -152,6 +161,28 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""action"": ""Reload"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""724fdadb-8fc5-4443-a110-0508865fd3c1"",
+                    ""path"": ""<Mouse>/forwardButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Ability"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d6461bbb-6efb-4e99-8ac0-9f68eb69683b"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Ability"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -164,6 +195,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         m_playerActions_Look = m_playerActions.FindAction("Look", throwIfNotFound: true);
         m_playerActions_Shoot = m_playerActions.FindAction("Shoot", throwIfNotFound: true);
         m_playerActions_Reload = m_playerActions.FindAction("Reload", throwIfNotFound: true);
+        m_playerActions_Ability = m_playerActions.FindAction("Ability", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -227,6 +259,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
     private readonly InputAction m_playerActions_Look;
     private readonly InputAction m_playerActions_Shoot;
     private readonly InputAction m_playerActions_Reload;
+    private readonly InputAction m_playerActions_Ability;
     public struct PlayerActionsActions
     {
         private @PlayerInput m_Wrapper;
@@ -235,6 +268,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         public InputAction @Look => m_Wrapper.m_playerActions_Look;
         public InputAction @Shoot => m_Wrapper.m_playerActions_Shoot;
         public InputAction @Reload => m_Wrapper.m_playerActions_Reload;
+        public InputAction @Ability => m_Wrapper.m_playerActions_Ability;
         public InputActionMap Get() { return m_Wrapper.m_playerActions; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -256,6 +290,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Reload.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnReload;
                 @Reload.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnReload;
                 @Reload.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnReload;
+                @Ability.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnAbility;
+                @Ability.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnAbility;
+                @Ability.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnAbility;
             }
             m_Wrapper.m_PlayerActionsActionsCallbackInterface = instance;
             if (instance != null)
@@ -272,6 +309,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Reload.started += instance.OnReload;
                 @Reload.performed += instance.OnReload;
                 @Reload.canceled += instance.OnReload;
+                @Ability.started += instance.OnAbility;
+                @Ability.performed += instance.OnAbility;
+                @Ability.canceled += instance.OnAbility;
             }
         }
     }
@@ -282,5 +322,6 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnShoot(InputAction.CallbackContext context);
         void OnReload(InputAction.CallbackContext context);
+        void OnAbility(InputAction.CallbackContext context);
     }
 }
