@@ -43,8 +43,7 @@ https://drive.google.com/file/d/1O0d_pqitpgbFYJG06JO6uAJjudI-QHwn/view       htt
 
 
  ----------------------------------  TO DO  ----------------------------------
-
-whya re there 4 vertecies there should be only 2 4 is a pain
+when having the wall weirdly there are spots where the raycast doenst work
 
 added perf checks and for somereason now nothing lags, there are some stutters but idk
 
@@ -57,4 +56,8 @@ Game idea - i was thinking zombies tbh, the zombies walk to the window, break it
 window can be repaired, if each "wall" holds a que of a list of vectors then i can just call the vectors from the latets destoyed and replenish them
 
 make the signals a child of the post so they move together
+
+or
+
+player needs to escape and to escape he needs to break walls and stuff
  */

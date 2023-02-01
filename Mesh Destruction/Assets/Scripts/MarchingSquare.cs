@@ -13,6 +13,9 @@ public class MarchingSquare : MonoBehaviour
     public Vector3[,] verticesStatic = new Vector3[0, 0];
     public MarchingSquarePoint[,] marchingPoints = new MarchingSquarePoint[0, 0];
 
+
+    private List<Vector3> debugPoints = new List<Vector3>();
+
     public List<MarchingSquarePoint> floodListMarching = new List<MarchingSquarePoint>();
 
     public bool disableGizmos;
@@ -29,6 +32,15 @@ public class MarchingSquare : MonoBehaviour
     private MeshFilter ownMeshFilter;
 
 
+
+    public int chunkSize = 8;
+  
+    private int CLength = 0;
+    private int CHeight = 0;
+
+    public int index = 0;
+
+
     private void Start()
     {
         CallMarch();
@@ -36,19 +48,92 @@ public class MarchingSquare : MonoBehaviour
         otherWallMarchinSquare = mirrorWall.GetComponent<MarchingSquare>();
         ownMeshFilter = this.GetComponent<MeshFilter>();
 
-        disableGizmos = true;
-
+        disableGizmos = false;
+        ChunkCreate(chunkSize, chunkSize);
     }
 
 
-    //might deete the wall check and just leave it, we could power down the projectile based on the travled distance
-  /// <summary>
-  /// Call this to receive a shoot to this plane and run the marhching cubes
-  /// </summary>
-  /// <param name="impactPoint"></param>
-  /// <param name="distanceEffect"></param>
-  /// <param name="direction"></param>
-  /// <param name="wall">false if its needs to propegate</param>
+    [HideInInspector]
+    public List<Chunk> chunks;
+
+    public void ChunkCreate(int height, int width)
+    {
+        int maxWidth = marchingPoints.GetLength(1);
+        int maxHeight = marchingPoints.GetLength(0);
+
+
+        Vector2Int BLhead = Vector2Int.zero;
+        Vector2Int TRhead = Vector2Int.zero;
+
+        int correctHeight = (maxHeight - 1) - TRhead.y >= height ? height : (maxHeight - 1) - TRhead.y;
+
+        TRhead = new Vector2Int(0, TRhead.y + correctHeight);
+
+        chunks = new List<Chunk>();
+        while (true)
+        {
+
+            if (TRhead.x + 1 >= maxWidth)  // needs to go in the new line
+            {
+                if (TRhead.y + 1 >= maxHeight)  // this checks if we are dont with the algo
+                {
+                    break;
+                }
+
+                BLhead = new Vector2Int(0, TRhead.y);
+
+                correctHeight = (maxHeight - 1) - TRhead.y >= height ? height : (maxHeight - 1) - TRhead.y;
+
+                TRhead = new Vector2Int(0, TRhead.y + correctHeight + 1);
+
+            }
+            else
+            {
+                int correctWidth = (maxWidth - 1) - TRhead.x >= width ? width : (maxWidth - 1) - TRhead.x;
+
+                TRhead = new Vector2Int(TRhead.x + correctWidth + 1, TRhead.y);
+
+                chunks.Add(new Chunk() { width = correctWidth, height = correctHeight });
+
+                var currChunk = chunks[chunks.Count - 1];
+                currChunk.topRight = TRhead;
+                currChunk.bottomLeft = BLhead;
+                currChunk.index = chunks.Count - 1;
+
+                BLhead = new Vector2Int(TRhead.x, BLhead.y);
+            }
+        }
+
+        for (int i = 0; i < chunks.Count; i++)
+        {
+
+            int widthChunk = chunks[i].topRight.x - chunks[i].bottomLeft.x;
+            int heightChunk = chunks[i].topRight.y - chunks[i].bottomLeft.y;
+
+            for (int y = 0; y < heightChunk; y++)
+            {
+                for (int x = 0; x < widthChunk; x++)
+                {
+                    marchingPoints[x + chunks[i].bottomLeft.x, y + chunks[i].bottomLeft.y].chunkIdx = chunks[i].index;
+                    chunks[i].listOfObjInChunk.Add(marchingPoints[x + chunks[i].bottomLeft.x, y + chunks[i].bottomLeft.y]);
+                }
+            }
+        }
+
+        CLength = marchingPoints.GetLength(1) / chunkSize;
+        CHeight = marchingPoints.GetLength(0) / chunkSize;
+    }
+
+
+
+    //might deete the wall check and just leave it, i could power down the projectile based on the travled distance
+    /// <summary>
+    /// Call this to receive a shoot to this plane and run the marhching cubes
+    /// </summary>
+    /// <param name="impactPoint"></param>
+    /// <param name="distanceEffect"></param>
+    /// <param name="direction"></param>
+    /// <param name="wall">false if its needs to propegate</param>
     public void ImpactReceiver(Vector3 impactPoint, float distanceEffect, Vector3 direction,float multi, AnimationCurve graph, bool wall = false)
     {
 
@@ -57,12 +142,71 @@ public class MarchingSquare : MonoBehaviour
         Stopwatch st = new Stopwatch();
         st.Start();
 
+        int wantedIDX = -1;
 
-        foreach (var point in marchingPoints)
+        for (int i = 0; i < chunks.Count; i++)
         {
-            if (Vector3.Distance(impactPoint, point.position) <= distanceEffect)
+            if (AABBCol(transform.TransformPoint(impactPoint), chunks[i]))
             {
-                point.weigth -= (graph.Evaluate(Vector3.Distance(impactPoint, point.position))) * multi;
+                wantedIDX = i;
+                break;
+            }
+        }
+
+        //wantedIDX = -1;
+
+        if (wantedIDX == -1)  // if the chunk system faild do everything
+        {
+            foreach (var point in marchingPoints)
+            {
+                if (Vector3.Distance(impactPoint, point.position) <= distanceEffect)
+                {
+                    point.weigth -= (graph.Evaluate(Vector3.Distance(impactPoint, point.position))) * multi;
+                }
+            }
+        }
+        else
+        {
+            debugPoints.Clear();
+
+            var indexesToDraw = new HashSet<int>();
+
+            indexesToDraw.Add(wantedIDX);
+
+            if (wantedIDX - 1 >0)
+                indexesToDraw.Add(wantedIDX - 1);  //left
+
+            if (wantedIDX + 1 < chunks.Count)
+                indexesToDraw.Add(wantedIDX + 1);  //right
+
+
+            if (wantedIDX + CLength < chunks.Count)
+                indexesToDraw.Add(wantedIDX + CLength);  //up 
+
+            if (wantedIDX - CLength > 0)
+                indexesToDraw.Add(wantedIDX - CLength);  //down
+
+            if (wantedIDX + CLength - 1 < chunks.Count)
+                indexesToDraw.Add(wantedIDX + CLength - 1);
+            if (wantedIDX - CLength + 1 > 0)
+                indexesToDraw.Add(wantedIDX - CLength + 1);
+            if (wantedIDX + CLength + 1 < chunks.Count)
+                indexesToDraw.Add(wantedIDX + CLength + 1);
+            if (wantedIDX - CLength -1 > 0)
+                indexesToDraw.Add(wantedIDX - CLength - 1);
+
+
+            foreach (var chunkIndex in indexesToDraw)
+            {
+                foreach (var point in chunks[chunkIndex].listOfObjInChunk)
+                {
+                    if (Vector3.Distance(impactPoint, marchingPoints[point.idx.y, point.idx.x].position) <= distanceEffect)
+                    {
+                        marchingPoints[point.idx.y, point.idx.x].weigth -= (graph.Evaluate(Vector3.Distance(impactPoint, marchingPoints[point.idx.y, point.idx.x].position))) * multi;
+                    }
+                    if (!wall)
+                        debugPoints.Add(this.transform.parent.TransformPoint(marchingPoints[point.idx.y, point.idx.x].position));
+                }
             }
         }
 
@@ -73,7 +217,7 @@ public class MarchingSquare : MonoBehaviour
 
             if (Physics.Raycast(transform.TransformPoint(impactPoint), direction, out hit, Mathf.Infinity))
             {
-                Debug.DrawRay(transform.TransformPoint(impactPoint), direction * hit.distance, Color.green, 50);
+                //Debug.DrawRay(transform.TransformPoint(impactPoint), direction * hit.distance, Color.green, 50);
                 if (hit.transform.GetComponent<MarchingSquare>() != null)
                 {
                     GameObject newRef = Instantiate(PlayerScript.instance.bulletPrefab);
@@ -83,7 +227,7 @@ public class MarchingSquare : MonoBehaviour
 
                     var marchComp = hit.transform.GetComponent<MarchingSquare>();
 
-                    marchComp.ImpactReceiver(newRef.transform.localPosition, distanceEffect, direction,multi * parentScript.energyLossMultiplier, graph, true);
+                    marchComp.ImpactReceiver(newRef.transform.localPosition, distanceEffect, direction, multi * parentScript.energyLossMultiplier, graph, true);
                 }
             }
         }
@@ -96,7 +240,30 @@ public class MarchingSquare : MonoBehaviour
 
         st.Stop();
 
-       // Debug.Log($"<color=red>Performance: OVERALL operation took {st.ElapsedMilliseconds} ticks</color>");
+        Debug.Log($"<color=red>Performance: OVERALL operation took {st.ElapsedMilliseconds} ticks</color>");
+    }
+
+
+
+
+    private bool AABBCol(Vector3 player, Chunk chunk)
+    {
+        int correctBLx = chunk.bottomLeft.x >= marchingPoints.GetLength(1) ? marchingPoints.GetLength(1) - 1 : chunk.bottomLeft.x;
+        int correctTRx = chunk.topRight.x >= marchingPoints.GetLength(1) ? marchingPoints.GetLength(1) - 1 : chunk.topRight.x;
+        int correctBLy = chunk.bottomLeft.y >= marchingPoints.GetLength(0) ? marchingPoints.GetLength(0) - 1 : chunk.bottomLeft.y;
+        int correctTRy = chunk.topRight.y >= marchingPoints.GetLength(0) ? marchingPoints.GetLength(0) - 1 : chunk.topRight.y;
+
+        var topRight = this.transform.parent.TransformPoint(marchingPoints[correctTRx, correctTRy].position);
+        var botLeft = this.transform.parent.TransformPoint(marchingPoints[correctBLx, correctBLy].position);
+
+        if (player.y >= botLeft.y && player.y < topRight.y)
+        {
+            if (player.z >= botLeft.z && player.z < topRight.z)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -410,7 +577,6 @@ public class MarchingSquare : MonoBehaviour
     {
         List<Vector3> vertices = new List<Vector3>();
 
-
         Vector3 midLeft = Vector3.Lerp(topLeft.position, botLeft.position, topLeft.weigth / (topLeft.weigth + botLeft.weigth));
         Vector3 midRight = Vector3.Lerp(topRight.position, botRight.position, topRight.weigth / (topRight.weigth + botRight.weigth));
         Vector3 midTop = Vector3.Lerp(topLeft.position, topRight.position, topLeft.weigth / (topLeft.weigth + topRight.weigth));
@@ -625,16 +791,122 @@ public class MarchingSquare : MonoBehaviour
 
     }
 
+
     private void OnDrawGizmos()
     {
-
         if (!disableGizmos)
         {
+            Gizmos.color = Color.cyan;
+
+
+
+
+
+
+            foreach (var point in debugPoints)
+            {
+                Gizmos.DrawSphere(point, 0.05f);
+            }
+
+
+
+
+            var chunk = chunks[index];
+
+
+
+            Gizmos.color = Color.green;
+            if (chunk.bottomLeft.x >= marchingPoints.GetLength(1) || chunk.bottomLeft.y >= marchingPoints.GetLength(1) || chunk.topRight.x >= marchingPoints.GetLength(0) || chunk.topRight.y >= marchingPoints.GetLength(0))
+            {
+            int correctBLx = chunk.bottomLeft.x >= marchingPoints.GetLength(1) ? marchingPoints.GetLength(1) - 1 : chunk.bottomLeft.x;
+            int correctTRx = chunk.topRight.x >= marchingPoints.GetLength(1) ? marchingPoints.GetLength(1) - 1 : chunk.topRight.x;
+            int correctBLy = chunk.bottomLeft.y >= marchingPoints.GetLength(0) ? marchingPoints.GetLength(0) - 1 : chunk.bottomLeft.y;
+            int correctTRy = chunk.topRight.y >= marchingPoints.GetLength(0) ? marchingPoints.GetLength(0) - 1 : chunk.topRight.y;
+
+
+            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[correctTRx, correctTRy].position), 0.2f);
+            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[correctBLx, correctBLy].position), 0.2f);
+
+            }
+            else
+            {
+            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[chunk.topRight.x, chunk.topRight.y].position), 0.2f);
+            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[chunk.bottomLeft.x, chunk.bottomLeft.y].position), 0.2f);
+            }
+
+
+           // Debug.Log($"{chunk.topRight.x}  {chunk.topRight.y}                      {chunk.bottomLeft.x}   {chunk.bottomLeft.y} ");
+
+
+
+
+
+
+
+
+            //int clock = 1;
+
+            //foreach (var chunk in chunks)
+            //{
+            //    if (clock == 1)
+            //    {
+            //        clock = 0;
+
+
+
+            //        //this should be the index of the positiong of the vertex
+
+            //        //Debug.Log($"{chunk.bottomLeft.x}   {chunk.bottomLeft.y}                           {chunk.topRight.x}    {chunk.topRight.y}");
+
+            //        if ( chunk.bottomLeft.x >= marchingPoints.GetLength(1) || chunk.bottomLeft.y >= marchingPoints.GetLength(1) || chunk.topRight.x >= marchingPoints.GetLength(0) || chunk.topRight.y >= marchingPoints.GetLength(0)) 
+            //        {
+            //            int correctBLx = chunk.bottomLeft.x >= marchingPoints.GetLength(1) ? marchingPoints.GetLength(1) - 1 : chunk.bottomLeft.x;
+            //            int correctTRx = chunk.topRight.x >= marchingPoints.GetLength(1) ? marchingPoints.GetLength(1) - 1 : chunk.topRight.x;
+            //            int correctBLy = chunk.bottomLeft.y >= marchingPoints.GetLength(0) ? marchingPoints.GetLength(0) - 1 : chunk.bottomLeft.y;
+            //            int correctTRy = chunk.topRight.y >= marchingPoints.GetLength(0) ? marchingPoints.GetLength(0) - 1 : chunk.topRight.y;
+
+
+            //            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[correctTRx, correctTRy].position), 0.05f);
+            //            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[correctBLx, correctBLy].position), 0.05f);
+
+            //        }
+            //        else
+            //        {
+            //            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[chunk.topRight.x, chunk.topRight.y].position), 0.05f);
+            //            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[chunk.bottomLeft.x, chunk.bottomLeft.y].position), 0.05f);
+            //        }
+
+
+            //        //foreach (var marchinPoint in chunk.listOfObjInChunk)
+            //        //{
+            //        //    // Gizmos.DrawSphere(this.transform.parent.transform.InverseTransformPoint(marchinPoint.position), 0.05f);
+            //        //    Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchinPoint.position), 0.05f);
+            //        //}
+            //    }
+            //    else
+            //    {
+            //        clock = 1;
+            //    }
+            //}
         }
     }
 
+}
 
 
+
+
+[Serializable]
+public class Chunk
+{
+    public Vector2Int topRight = Vector2Int.zero;
+    public Vector2Int bottomLeft = Vector2Int.zero;
+
+    public int width;
+    public int height;
+
+    public int index = 0;
+    public List<MarchingSquarePoint> listOfObjInChunk = new List<MarchingSquarePoint>();
 }
 
 

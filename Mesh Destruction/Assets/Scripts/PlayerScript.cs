@@ -174,7 +174,7 @@ public class PlayerScript : MonoBehaviour
                     }
 
                     //Instantiate(effect, outHit.point, effect.transform.rotation);
-                    Debug.DrawRay(Camera.main.transform.position, newDir * outHit.distance, Color.yellow, 90);
+                  //  Debug.DrawRay(Camera.main.transform.position, newDir * outHit.distance, Color.yellow, 90);
                 }
             }
          

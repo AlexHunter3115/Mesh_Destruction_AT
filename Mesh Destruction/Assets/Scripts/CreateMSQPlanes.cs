@@ -17,7 +17,8 @@ public class CreateMSQPlanes : MonoBehaviour
 
     public GameObject outerWall1;
     public GameObject innerWall1;
-
+    [Space(4)]
+    [Header("Designer stuff")]
     public float distance = 0.1f;
 
     [Range(0.1f,0.95f)]
