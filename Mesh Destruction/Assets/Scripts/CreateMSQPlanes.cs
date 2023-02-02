@@ -29,6 +29,10 @@ public class CreateMSQPlanes : MonoBehaviour
 
     public int voronoiNum = 0;
 
+
+    [Range(5, 15)]
+    public int chunkSystemSize = 0;
+
     public Material mat;
 
 
@@ -58,6 +62,7 @@ public class CreateMSQPlanes : MonoBehaviour
         innerWall2.AddComponent<MeshCollider>();
         var march = innerWall2.AddComponent<MarchingSquare>();
         march.inner = true;
+        march.chunkSize = chunkSystemSize;
         march.parentScript = this;
 
         march.mirrorWall = outerWall2;
@@ -118,8 +123,9 @@ public class CreateMSQPlanes : MonoBehaviour
         march = innerWall1.AddComponent<MarchingSquare>();
         march.parentScript = this;
         march.inner = false;
+        march.chunkSize = chunkSystemSize;
 
-     
+
         march.mirrorWall = outerWall1;
 
         innerWall1.transform.localPosition = new Vector3(distance, 0, 0);
@@ -178,6 +184,8 @@ public class CreateMSQPlanes : MonoBehaviour
         march = outerWall1.AddComponent<MarchingSquare>();
         march.parentScript = this;
         march.inner = true;
+
+        march.chunkSize = chunkSystemSize;
         march.mirrorWall = innerWall1;
 
         outerWall1.transform.localPosition = new Vector3(distance, 0, 0);
@@ -237,6 +245,7 @@ public class CreateMSQPlanes : MonoBehaviour
         march = outerWall2.AddComponent<MarchingSquare>();
         march.mirrorWall = innerWall2;
 
+        march.chunkSize = chunkSystemSize;
         march.parentScript = this;
         march.inner = false;
 
@@ -291,6 +300,7 @@ public class CreateMSQPlanes : MonoBehaviour
 
         march = innerWall2.GetComponent<MarchingSquare>();
         march.mirrorWall = outerWall2;
+
 
 
 

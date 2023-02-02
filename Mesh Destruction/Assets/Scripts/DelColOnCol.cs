@@ -5,7 +5,6 @@ using UnityEngine;
 public class DelColOnCol : MonoBehaviour
 {
     public float dissapearTimer = 2;
-   // private bool shrink = false;
 
     void OnCollisionEnter(Collision collision)
     {

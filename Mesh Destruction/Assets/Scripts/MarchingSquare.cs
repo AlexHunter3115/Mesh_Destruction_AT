@@ -13,12 +13,7 @@ public class MarchingSquare : MonoBehaviour
     public Vector3[,] verticesStatic = new Vector3[0, 0];
     public MarchingSquarePoint[,] marchingPoints = new MarchingSquarePoint[0, 0];
 
-
-    private List<Vector3> debugPoints = new List<Vector3>();
-
     public List<MarchingSquarePoint> floodListMarching = new List<MarchingSquarePoint>();
-
-    public bool disableGizmos;
 
     public GameObject mirrorWall;
 
@@ -34,11 +29,7 @@ public class MarchingSquare : MonoBehaviour
 
 
     public int chunkSize = 8;
-  
     private int CLength = 0;
-    private int CHeight = 0;
-
-    public int index = 0;
 
 
     private void Start()
@@ -48,7 +39,6 @@ public class MarchingSquare : MonoBehaviour
         otherWallMarchinSquare = mirrorWall.GetComponent<MarchingSquare>();
         ownMeshFilter = this.GetComponent<MeshFilter>();
 
-        disableGizmos = false;
         ChunkCreate(chunkSize, chunkSize);
     }
 
@@ -69,6 +59,8 @@ public class MarchingSquare : MonoBehaviour
 
         TRhead = new Vector2Int(0, TRhead.y + correctHeight);
 
+        int chunkXCheck = 0;
+
         chunks = new List<Chunk>();
         while (true)
         {
@@ -85,10 +77,12 @@ public class MarchingSquare : MonoBehaviour
                 correctHeight = (maxHeight - 1) - TRhead.y >= height ? height : (maxHeight - 1) - TRhead.y;
 
                 TRhead = new Vector2Int(0, TRhead.y + correctHeight + 1);
-
+                chunkXCheck = 0;
             }
             else
             {
+                chunkXCheck++;
+
                 int correctWidth = (maxWidth - 1) - TRhead.x >= width ? width : (maxWidth - 1) - TRhead.x;
 
                 TRhead = new Vector2Int(TRhead.x + correctWidth + 1, TRhead.y);
@@ -120,8 +114,7 @@ public class MarchingSquare : MonoBehaviour
             }
         }
 
-        CLength = marchingPoints.GetLength(1) / chunkSize;
-        CHeight = marchingPoints.GetLength(0) / chunkSize;
+        CLength = chunkXCheck;
     }
 
 
@@ -136,11 +129,7 @@ public class MarchingSquare : MonoBehaviour
     /// <param name="wall">false if its needs to propegate</param>
     public void ImpactReceiver(Vector3 impactPoint, float distanceEffect, Vector3 direction,float multi, AnimationCurve graph, bool wall = false)
     {
-
         marchingPoints = otherWallMarchinSquare.marchingPoints;
-
-        Stopwatch st = new Stopwatch();
-        st.Start();
 
         int wantedIDX = -1;
 
@@ -152,8 +141,6 @@ public class MarchingSquare : MonoBehaviour
                 break;
             }
         }
-
-        //wantedIDX = -1;
 
         if (wantedIDX == -1)  // if the chunk system faild do everything
         {
@@ -167,24 +154,21 @@ public class MarchingSquare : MonoBehaviour
         }
         else
         {
-            debugPoints.Clear();
-
             var indexesToDraw = new HashSet<int>();
 
             indexesToDraw.Add(wantedIDX);
 
             if (wantedIDX - 1 >0)
-                indexesToDraw.Add(wantedIDX - 1);  //left
+                indexesToDraw.Add(wantedIDX - 1); 
 
             if (wantedIDX + 1 < chunks.Count)
-                indexesToDraw.Add(wantedIDX + 1);  //right
-
+                indexesToDraw.Add(wantedIDX + 1); 
 
             if (wantedIDX + CLength < chunks.Count)
-                indexesToDraw.Add(wantedIDX + CLength);  //up 
+                indexesToDraw.Add(wantedIDX + CLength);  
 
             if (wantedIDX - CLength > 0)
-                indexesToDraw.Add(wantedIDX - CLength);  //down
+                indexesToDraw.Add(wantedIDX - CLength);  
 
             if (wantedIDX + CLength - 1 < chunks.Count)
                 indexesToDraw.Add(wantedIDX + CLength - 1);
@@ -195,7 +179,6 @@ public class MarchingSquare : MonoBehaviour
             if (wantedIDX - CLength -1 > 0)
                 indexesToDraw.Add(wantedIDX - CLength - 1);
 
-
             foreach (var chunkIndex in indexesToDraw)
             {
                 foreach (var point in chunks[chunkIndex].listOfObjInChunk)
@@ -204,8 +187,6 @@ public class MarchingSquare : MonoBehaviour
                     {
                         marchingPoints[point.idx.y, point.idx.x].weigth -= (graph.Evaluate(Vector3.Distance(impactPoint, marchingPoints[point.idx.y, point.idx.x].position))) * multi;
                     }
-                    if (!wall)
-                        debugPoints.Add(this.transform.parent.TransformPoint(marchingPoints[point.idx.y, point.idx.x].position));
                 }
             }
         }
@@ -217,7 +198,6 @@ public class MarchingSquare : MonoBehaviour
 
             if (Physics.Raycast(transform.TransformPoint(impactPoint), direction, out hit, Mathf.Infinity))
             {
-                //Debug.DrawRay(transform.TransformPoint(impactPoint), direction * hit.distance, Color.green, 50);
                 if (hit.transform.GetComponent<MarchingSquare>() != null)
                 {
                     GameObject newRef = Instantiate(PlayerScript.instance.bulletPrefab);
@@ -238,9 +218,6 @@ public class MarchingSquare : MonoBehaviour
 
         otherWallMarchinSquare.CopyMesh(ownMeshFilter.mesh);
 
-        st.Stop();
-
-        Debug.Log($"<color=red>Performance: OVERALL operation took {st.ElapsedMilliseconds} ticks</color>");
     }
 
 
@@ -569,10 +546,6 @@ public class MarchingSquare : MonoBehaviour
 
     }
 
-
-
-    //altought here might not be like alot of tri, the arry only takes i think 60k but i am giving it 80k so need to figrue out a way
-
     private List<Vector3> DrawOrder(int activated, MarchingSquarePoint topLeft, MarchingSquarePoint topRight, MarchingSquarePoint botLeft, MarchingSquarePoint botRight)
     {
         List<Vector3> vertices = new List<Vector3>();
@@ -790,107 +763,6 @@ public class MarchingSquare : MonoBehaviour
 
 
     }
-
-
-    private void OnDrawGizmos()
-    {
-        if (!disableGizmos)
-        {
-            Gizmos.color = Color.cyan;
-
-
-
-
-
-
-            foreach (var point in debugPoints)
-            {
-                Gizmos.DrawSphere(point, 0.05f);
-            }
-
-
-
-
-            var chunk = chunks[index];
-
-
-
-            Gizmos.color = Color.green;
-            if (chunk.bottomLeft.x >= marchingPoints.GetLength(1) || chunk.bottomLeft.y >= marchingPoints.GetLength(1) || chunk.topRight.x >= marchingPoints.GetLength(0) || chunk.topRight.y >= marchingPoints.GetLength(0))
-            {
-            int correctBLx = chunk.bottomLeft.x >= marchingPoints.GetLength(1) ? marchingPoints.GetLength(1) - 1 : chunk.bottomLeft.x;
-            int correctTRx = chunk.topRight.x >= marchingPoints.GetLength(1) ? marchingPoints.GetLength(1) - 1 : chunk.topRight.x;
-            int correctBLy = chunk.bottomLeft.y >= marchingPoints.GetLength(0) ? marchingPoints.GetLength(0) - 1 : chunk.bottomLeft.y;
-            int correctTRy = chunk.topRight.y >= marchingPoints.GetLength(0) ? marchingPoints.GetLength(0) - 1 : chunk.topRight.y;
-
-
-            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[correctTRx, correctTRy].position), 0.2f);
-            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[correctBLx, correctBLy].position), 0.2f);
-
-            }
-            else
-            {
-            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[chunk.topRight.x, chunk.topRight.y].position), 0.2f);
-            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[chunk.bottomLeft.x, chunk.bottomLeft.y].position), 0.2f);
-            }
-
-
-           // Debug.Log($"{chunk.topRight.x}  {chunk.topRight.y}                      {chunk.bottomLeft.x}   {chunk.bottomLeft.y} ");
-
-
-
-
-
-
-
-
-            //int clock = 1;
-
-            //foreach (var chunk in chunks)
-            //{
-            //    if (clock == 1)
-            //    {
-            //        clock = 0;
-
-
-
-            //        //this should be the index of the positiong of the vertex
-
-            //        //Debug.Log($"{chunk.bottomLeft.x}   {chunk.bottomLeft.y}                           {chunk.topRight.x}    {chunk.topRight.y}");
-
-            //        if ( chunk.bottomLeft.x >= marchingPoints.GetLength(1) || chunk.bottomLeft.y >= marchingPoints.GetLength(1) || chunk.topRight.x >= marchingPoints.GetLength(0) || chunk.topRight.y >= marchingPoints.GetLength(0)) 
-            //        {
-            //            int correctBLx = chunk.bottomLeft.x >= marchingPoints.GetLength(1) ? marchingPoints.GetLength(1) - 1 : chunk.bottomLeft.x;
-            //            int correctTRx = chunk.topRight.x >= marchingPoints.GetLength(1) ? marchingPoints.GetLength(1) - 1 : chunk.topRight.x;
-            //            int correctBLy = chunk.bottomLeft.y >= marchingPoints.GetLength(0) ? marchingPoints.GetLength(0) - 1 : chunk.bottomLeft.y;
-            //            int correctTRy = chunk.topRight.y >= marchingPoints.GetLength(0) ? marchingPoints.GetLength(0) - 1 : chunk.topRight.y;
-
-
-            //            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[correctTRx, correctTRy].position), 0.05f);
-            //            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[correctBLx, correctBLy].position), 0.05f);
-
-            //        }
-            //        else
-            //        {
-            //            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[chunk.topRight.x, chunk.topRight.y].position), 0.05f);
-            //            Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchingPoints[chunk.bottomLeft.x, chunk.bottomLeft.y].position), 0.05f);
-            //        }
-
-
-            //        //foreach (var marchinPoint in chunk.listOfObjInChunk)
-            //        //{
-            //        //    // Gizmos.DrawSphere(this.transform.parent.transform.InverseTransformPoint(marchinPoint.position), 0.05f);
-            //        //    Gizmos.DrawSphere(this.transform.parent.TransformPoint(marchinPoint.position), 0.05f);
-            //        //}
-            //    }
-            //    else
-            //    {
-            //        clock = 1;
-            //    }
-            //}
-        }
-    }
-
 }
 
 

@@ -56,13 +56,11 @@ public class PlayerScript : MonoBehaviour
     public AnimationCurve weightDistribution = new AnimationCurve();
 
 
-    private bool shootPressed= false;
+    private bool shootPressed = false;
 
 
     private void Awake()
     {
-
-
         instance = this;
 
         playerInput = new PlayerInput();
@@ -70,7 +68,6 @@ public class PlayerScript : MonoBehaviour
         animCont = GetComponent<Animator>();
 
         controller = GetComponent<CharacterController>();
-      
     }
 
     private void OnEnable()
@@ -80,7 +77,6 @@ public class PlayerScript : MonoBehaviour
         shoot = playerInput.playerActions.Shoot;
         reload = playerInput.playerActions.Reload;
         ability = playerInput.playerActions.Ability;
-
 
         move.Enable();
         look.Enable();
@@ -106,7 +102,7 @@ public class PlayerScript : MonoBehaviour
 
 
 
-    private void AbilitySwitch(InputAction.CallbackContext context) 
+    private void AbilitySwitch(InputAction.CallbackContext context)
     {
         seeThroughCam.enabled = !seeThroughCam.enabled;
     }
@@ -132,7 +128,7 @@ public class PlayerScript : MonoBehaviour
     }
 
 
-    public void ReloadGun(InputAction.CallbackContext context) 
+    public void ReloadGun(InputAction.CallbackContext context)
     {
         animCont.SetTrigger("reload");
     }
@@ -140,48 +136,41 @@ public class PlayerScript : MonoBehaviour
 
     public void ShootingRayCastManager()
     {
+        var x = (1 - 2 * Random.value) * 0.005f;
+        var y = (1 - 2 * Random.value) * 0.005f;
 
-      
-            var x = (1 - 2 * Random.value) * 0.005f;
-            var y = (1 - 2 * Random.value) * 0.005f;
+        Vector3 newDir = Camera.main.transform.TransformDirection(new Vector3(x, y, 1));
 
-            Vector3 newDir = Camera.main.transform.TransformDirection(new Vector3(x, y, 1));
+        if (Time.time > lastFire + fireRate && !animCont.GetCurrentAnimatorStateInfo(0).IsName("Rig|AK_Reload"))    //&& !animCont.GetCurrentAnimatorStateInfo(0).IsName("Rig|AK_Shot") &&
+        {
+            animCont.SetTrigger("shoot");
 
-            if (Time.time > lastFire + fireRate && !animCont.GetCurrentAnimatorStateInfo(0).IsName("Rig|AK_Reload"))    //&& !animCont.GetCurrentAnimatorStateInfo(0).IsName("Rig|AK_Shot") &&
+            lastFire = Time.time;
+            RaycastHit outHit;
+            if (Physics.Raycast(Camera.main.transform.position, newDir, out outHit, Mathf.Infinity))
             {
-                animCont.SetTrigger("shoot");
-
-                lastFire = Time.time;
-                RaycastHit outHit;
-                if (Physics.Raycast(Camera.main.transform.position, newDir, out outHit, Mathf.Infinity))
+                if (outHit.transform.GetComponent<MarchingSquare>() != null)
                 {
-                    if (outHit.transform.GetComponent<MarchingSquare>() != null)
-                    {
-                        GameObject newRef = Instantiate(bulletPrefab);
+                    GameObject newRef = Instantiate(bulletPrefab);
 
-                        newRef.transform.position = outHit.point;
-                        newRef.transform.parent = outHit.transform;
+                    newRef.transform.position = outHit.point;
+                    newRef.transform.parent = outHit.transform;
 
-                        var marchComp = outHit.transform.GetComponent<MarchingSquare>();
+                    var marchComp = outHit.transform.GetComponent<MarchingSquare>();
 
-                        marchComp.ImpactReceiver(newRef.transform.localPosition, distanceEffect, newDir, 1f, weightDistribution);
-                    }
-                    else
-                    {
-                        GameObject newRef = Instantiate(bulletPrefab);
-                        newRef.transform.position = outHit.point;
-                        newRef.transform.parent = outHit.transform;
-                    }
-
-                    //Instantiate(effect, outHit.point, effect.transform.rotation);
-                  //  Debug.DrawRay(Camera.main.transform.position, newDir * outHit.distance, Color.yellow, 90);
+                    marchComp.ImpactReceiver(newRef.transform.localPosition, distanceEffect, newDir, 1f, weightDistribution);
                 }
+                else
+                {
+                    GameObject newRef = Instantiate(bulletPrefab);
+                    newRef.transform.position = outHit.point;
+                    newRef.transform.parent = outHit.transform;
+                }
+
+                //Instantiate(effect, outHit.point, effect.transform.rotation);
+                Debug.DrawRay(Camera.main.transform.position, newDir * outHit.distance, Color.yellow, 90);
             }
-         
-       
-
-
-
+        }
     }
 
 
@@ -197,6 +186,7 @@ public class PlayerScript : MonoBehaviour
 
         if (isGrouded && playerVelocity.y < 0)
             playerVelocity.y = -2f;
+
         playerVelocity.y += gravity * Time.deltaTime;
         controller.Move(playerVelocity * Time.deltaTime);
 
@@ -204,8 +194,6 @@ public class PlayerScript : MonoBehaviour
 
     public void ProcessLook(Vector2 input)
     {
-
-
         float mouseX = input.x;
         float mouseY = input.y;
 
@@ -225,8 +213,5 @@ public class PlayerScript : MonoBehaviour
 
         animCont.SetFloat("speed", speed);
     }
-
-
-
 }
 

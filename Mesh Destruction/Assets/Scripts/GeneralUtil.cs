@@ -10,9 +10,6 @@ using Random = UnityEngine.Random;
 public static class GeneralUtil
 {
 
-
-
-
     /// <summary>
     /// Gives a certin amoutn of point and it will return the triangle array and the vector array to create the convex hull
     /// </summary>
@@ -44,7 +41,6 @@ public static class GeneralUtil
 
         int iter = 0;
         //bool destroy = false;
-
 
         while (points.Count > 1)
         {
@@ -206,8 +202,6 @@ public static class GeneralUtil
     {
         Stopwatch st = new Stopwatch();
         st.Start();
-        //need to check that the voronoi points isnt larger than the giving vertpoints
-
 
         List<Vector3> choosenPoints = new List<Vector3>();
 

@@ -196,6 +196,7 @@ MonoBehaviour:
   resolutionX: 60
   resolutionY: 60
   voronoiNum: 0
+  chunkSystemSize: 10
   mat: {fileID: 2100000, guid: 180a2a1a2ffebed4a9dc3f38592a45f6, type: 2}
   typeOfFragElimination: 0
   fragElimTimer: 2
@@ -356,6 +357,7 @@ MonoBehaviour:
   resolutionX: 60
   resolutionY: 60
   voronoiNum: 0
+  chunkSystemSize: 10
   mat: {fileID: 2100000, guid: 180a2a1a2ffebed4a9dc3f38592a45f6, type: 2}
   typeOfFragElimination: 1
   fragElimTimer: 2
@@ -743,6 +745,7 @@ MonoBehaviour:
   resolutionX: 60
   resolutionY: 60
   voronoiNum: 0
+  chunkSystemSize: 10
   mat: {fileID: 2100000, guid: 180a2a1a2ffebed4a9dc3f38592a45f6, type: 2}
   typeOfFragElimination: 0
   fragElimTimer: 2
@@ -839,6 +842,7 @@ MonoBehaviour:
   resolutionX: 60
   resolutionY: 60
   voronoiNum: 0
+  chunkSystemSize: 10
   mat: {fileID: 2100000, guid: 180a2a1a2ffebed4a9dc3f38592a45f6, type: 2}
   typeOfFragElimination: 0
   fragElimTimer: 2
@@ -1261,6 +1265,7 @@ MonoBehaviour:
   resolutionX: 60
   resolutionY: 60
   voronoiNum: 0
+  chunkSystemSize: 10
   mat: {fileID: 2100000, guid: 180a2a1a2ffebed4a9dc3f38592a45f6, type: 2}
   typeOfFragElimination: 0
   fragElimTimer: 2
@@ -1584,6 +1589,7 @@ MonoBehaviour:
   resolutionX: 60
   resolutionY: 60
   voronoiNum: 0
+  chunkSystemSize: 10
   mat: {fileID: 2100000, guid: 180a2a1a2ffebed4a9dc3f38592a45f6, type: 2}
   typeOfFragElimination: 1
   fragElimTimer: 2
@@ -2236,6 +2242,7 @@ MonoBehaviour:
   resolutionX: 60
   resolutionY: 60
   voronoiNum: 6
+  chunkSystemSize: 10
   mat: {fileID: 2100000, guid: 180a2a1a2ffebed4a9dc3f38592a45f6, type: 2}
   typeOfFragElimination: 0
   fragElimTimer: 2
@@ -4319,6 +4326,7 @@ MonoBehaviour:
   resolutionX: 60
   resolutionY: 60
   voronoiNum: 0
+  chunkSystemSize: 10
   mat: {fileID: 2100000, guid: 180a2a1a2ffebed4a9dc3f38592a45f6, type: 2}
   typeOfFragElimination: 0
   fragElimTimer: 2
