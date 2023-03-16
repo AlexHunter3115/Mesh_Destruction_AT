@@ -204,8 +204,8 @@ public class PlayerScript : MonoBehaviour
         {
             showingText = true;
             var comp = messages.Dequeue();
-            var obj = Instantiate(messageUI, canvas.transform);
-            obj.GetComponent<MessageUI>().CallSetMessage(comp.text, comp.color);
+            currentMessage = Instantiate(messageUI, canvas.transform);
+            currentMessage.GetComponent<MessageUI>().CallSetMessage(comp.text, comp.color);
         }
 
         if (!stopTimer) 
