@@ -26,10 +26,8 @@ public class MarchingSquare : MonoBehaviour
     private MarchingSquare otherWallMarchinSquare;
     private MeshFilter ownMeshFilter;
 
-
-
-    public int chunkSize = 8;
-    private int CLength = 0;
+    public int chunkSize = 6;
+    //private int CLength = 0;
 
 
     private void Start()
@@ -39,84 +37,44 @@ public class MarchingSquare : MonoBehaviour
         otherWallMarchinSquare = mirrorWall.GetComponent<MarchingSquare>();
         ownMeshFilter = this.GetComponent<MeshFilter>();
 
-        ChunkCreate(chunkSize, chunkSize);
+        ChunkCreate(chunkSize);
     }
 
 
     [HideInInspector]
-    public List<Chunk> chunks;
+    public List<Chunk> chunks = new List<Chunk>();
 
-    public void ChunkCreate(int height, int width)
+
+    public void ChunkCreate(int chunkSize)
     {
-        int maxWidth = marchingPoints.GetLength(1);
-        int maxHeight = marchingPoints.GetLength(0);
-
-
-        Vector2Int BLhead = Vector2Int.zero;
-        Vector2Int TRhead = Vector2Int.zero;
-
-        int correctHeight = (maxHeight - 1) - TRhead.y >= height ? height : (maxHeight - 1) - TRhead.y;
-
-        TRhead = new Vector2Int(0, TRhead.y + correctHeight);
-
-        int chunkXCheck = 0;
-
-        chunks = new List<Chunk>();
-        while (true)
+        for (int row = 0; row < marchingPoints.GetLength(0); row += chunkSize)
         {
-
-            if (TRhead.x + 1 >= maxWidth)  // needs to go in the new line
+            for (int col = 0; col < marchingPoints.GetLength(1); col += chunkSize)
             {
-                if (TRhead.y + 1 >= maxHeight)  // this checks if we are dont with the algo
+                chunks.Add(new Chunk());
+
+                for (int i = 0; i < chunkSize; i++)
                 {
-                    break;
-                }
-
-                BLhead = new Vector2Int(0, TRhead.y);
-
-                correctHeight = (maxHeight - 1) - TRhead.y >= height ? height : (maxHeight - 1) - TRhead.y;
-
-                TRhead = new Vector2Int(0, TRhead.y + correctHeight + 1);
-                chunkXCheck = 0;
-            }
-            else
-            {
-                chunkXCheck++;
-
-                int correctWidth = (maxWidth - 1) - TRhead.x >= width ? width : (maxWidth - 1) - TRhead.x;
-
-                TRhead = new Vector2Int(TRhead.x + correctWidth + 1, TRhead.y);
-
-                chunks.Add(new Chunk() { width = correctWidth, height = correctHeight });
-
-                var currChunk = chunks[chunks.Count - 1];
-                currChunk.topRight = TRhead;
-                currChunk.bottomLeft = BLhead;
-                currChunk.index = chunks.Count - 1;
-
-                BLhead = new Vector2Int(TRhead.x, BLhead.y);
-            }
-        }
-
-        for (int i = 0; i < chunks.Count; i++)
-        {
-
-            int widthChunk = chunks[i].topRight.x - chunks[i].bottomLeft.x;
-            int heightChunk = chunks[i].topRight.y - chunks[i].bottomLeft.y;
-
-            for (int y = 0; y < heightChunk; y++)
-            {
-                for (int x = 0; x < widthChunk; x++)
-                {
-                    marchingPoints[x + chunks[i].bottomLeft.x, y + chunks[i].bottomLeft.y].chunkIdx = chunks[i].index;
-                    chunks[i].listOfObjInChunk.Add(marchingPoints[x + chunks[i].bottomLeft.x, y + chunks[i].bottomLeft.y]);
+                    for (int j = 0; j < chunkSize; j++)
+                    {
+                        if (row + i < marchingPoints.GetLength(0) && col + j < marchingPoints.GetLength(1)) 
+                        {
+                            chunks[chunks.Count - 1].listOfObjInChunk.Add(marchingPoints[row + i, col + j]);   
+                            
+                            if (i == 0 && j == 0) //first pass
+                            {
+                                chunks[chunks.Count - 1].bottomLeft = new Vector2Int(row + i, col + j);
+                            }
+                            else 
+                            {
+                                chunks[chunks.Count - 1].topRight = new Vector2Int(row + i, col + j);
+                            }
+                        }
+                    }
                 }
             }
         }
-
-        CLength = chunkXCheck;
     }
-
 
 
     //might deete the wall check and just leave it, i could power down the projectile based on the travled distance
@@ -148,39 +106,35 @@ public class MarchingSquare : MonoBehaviour
             {
                 if (Vector3.Distance(impactPoint, point.position) <= distanceEffect)
                 {
-                    point.weigth -= (graph.Evaluate(Vector3.Distance(impactPoint, point.position))) * multi;
+                    point.weigth -= ((graph.Evaluate(Vector3.Distance(impactPoint, point.position))) * multi) * parentScript.strengthOfObject;
                 }
             }
         }
         else
         {
-            var indexesToDraw = new HashSet<int>();
+            var indexesToDraw = new List<int>();
 
             indexesToDraw.Add(wantedIDX);
 
-            if (wantedIDX - 1 >0)
-                indexesToDraw.Add(wantedIDX - 1); 
+            var size = Mathf.CeilToInt((float)marchingPoints.GetLength(0) / (float)chunkSize);
 
-            if (wantedIDX + 1 < chunks.Count)
-                indexesToDraw.Add(wantedIDX + 1); 
+            indexesToDraw.Add(wantedIDX - 1);
+            indexesToDraw.Add(wantedIDX + 1);
 
-            if (wantedIDX + CLength < chunks.Count)
-                indexesToDraw.Add(wantedIDX + CLength);  
+            indexesToDraw.Add(wantedIDX + size); 
+            indexesToDraw.Add(wantedIDX - size);
 
-            if (wantedIDX - CLength > 0)
-                indexesToDraw.Add(wantedIDX - CLength);  
-
-            if (wantedIDX + CLength - 1 < chunks.Count)
-                indexesToDraw.Add(wantedIDX + CLength - 1);
-            if (wantedIDX - CLength + 1 > 0)
-                indexesToDraw.Add(wantedIDX - CLength + 1);
-            if (wantedIDX + CLength + 1 < chunks.Count)
-                indexesToDraw.Add(wantedIDX + CLength + 1);
-            if (wantedIDX - CLength -1 > 0)
-                indexesToDraw.Add(wantedIDX - CLength - 1);
+            indexesToDraw.Add(indexesToDraw[4] + 1);
+            indexesToDraw.Add(indexesToDraw[4] - 1);
+            indexesToDraw.Add(indexesToDraw[3] - 1);
+            indexesToDraw.Add(indexesToDraw[3] + 1);
 
             foreach (var chunkIndex in indexesToDraw)
             {
+                if (chunkIndex < 0 || chunkIndex >= chunks.Count) 
+                {
+                    continue;
+                }
                 foreach (var point in chunks[chunkIndex].listOfObjInChunk)
                 {
                     if (Vector3.Distance(impactPoint, marchingPoints[point.idx.y, point.idx.x].position) <= distanceEffect)
@@ -190,7 +144,6 @@ public class MarchingSquare : MonoBehaviour
                 }
             }
         }
-
 
         if (!wall)
         {
@@ -212,16 +165,11 @@ public class MarchingSquare : MonoBehaviour
             }
         }
 
-
         CallMarch();
         FloodFillSetup();
 
         otherWallMarchinSquare.CopyMesh(ownMeshFilter.mesh);
-
     }
-
-
-
 
     private bool AABBCol(Vector3 player, Chunk chunk)
     {
@@ -230,8 +178,8 @@ public class MarchingSquare : MonoBehaviour
         int correctBLy = chunk.bottomLeft.y >= marchingPoints.GetLength(0) ? marchingPoints.GetLength(0) - 1 : chunk.bottomLeft.y;
         int correctTRy = chunk.topRight.y >= marchingPoints.GetLength(0) ? marchingPoints.GetLength(0) - 1 : chunk.topRight.y;
 
-        var topRight = this.transform.parent.TransformPoint(marchingPoints[correctTRx, correctTRy].position);
-        var botLeft = this.transform.parent.TransformPoint(marchingPoints[correctBLx, correctBLy].position);
+        var topRight = transform.parent.TransformPoint(marchingPoints[correctTRx, correctTRy].position);
+        var botLeft = transform.parent.TransformPoint(marchingPoints[correctBLx, correctBLy].position);
 
         if (player.y >= botLeft.y && player.y < topRight.y)
         {
@@ -242,7 +190,6 @@ public class MarchingSquare : MonoBehaviour
         }
         return false;
     }
-
 
     private void FloodFillSetup()
     {
@@ -347,16 +294,21 @@ public class MarchingSquare : MonoBehaviour
                    
                         foreach (var voronoi in voroniOutcome)
                         {
-                            var increOutcom = GeneralUtil.IncrementalConvex(voronoi);
+                            if (voronoi.Count > 5) 
+                            {
+                                var increOutcom = GeneralUtil.IncrementalConvex(voronoi);
 
-                            FormObject(increOutcom.Item1, increOutcom.Item2, this.transform.localPosition.x > 0 ? true : false);
+                                if (increOutcom != null)
+                                    FormObject(increOutcom.Item1, increOutcom.Item2, this.transform.localPosition.x > 0 ? true : false);
+                            }
                         }
                     }
                     else 
                     {
                         var increOutcom = GeneralUtil.IncrementalConvex(vectorOfVectors);
 
-                        FormObject(increOutcom.Item1, increOutcom.Item2, this.transform.localPosition.x > 0 ? true : false);
+                        if (increOutcom != null)
+                            FormObject(increOutcom.Item1, increOutcom.Item2, this.transform.localPosition.x > 0 ? true : false);
                     }
 
 
@@ -373,6 +325,7 @@ public class MarchingSquare : MonoBehaviour
         //Debug.Log($"<color=yellow>Performance: flood fill operation took {st.ElapsedMilliseconds} milliseconds</color>");
 
     }
+
     private void FloodCall(int x, int y)
     {
         if (y >= 0 && x >= 0 && y < marchingPoints.GetLength(0) && x < marchingPoints.GetLength(1))
@@ -391,12 +344,8 @@ public class MarchingSquare : MonoBehaviour
         }
     }
 
-
     private void CallMarch()
     {
-        Stopwatch st = new Stopwatch();
-        st.Start();
-
         Mesh mesh = GetComponent<MeshFilter>().mesh;
 
         mesh.Clear();
@@ -404,12 +353,10 @@ public class MarchingSquare : MonoBehaviour
         List<Vector3> verticesList = new List<Vector3>();
         List<int> trianglesList = new List<int>();
 
-
         for (int y = 0; y < parentScript.resolutionY; y++)
         {
             for (int x = 0; x < parentScript.resolutionX; x++)
             {
-
                 int binary = 0;
                 
                 var marchSquareTL = marchingPoints[y, x];    //8
@@ -425,7 +372,6 @@ public class MarchingSquare : MonoBehaviour
 
                 var addingList = DrawOrder(binary, marchSquareTL, marchSquareTR, marchSquareBL, marchSquareBR);
 
-
                 for (int i = 0; i < addingList.Count; i++)
                 {
                     trianglesList.Add(verticesList.Count);
@@ -434,7 +380,6 @@ public class MarchingSquare : MonoBehaviour
             }
         }
 
-        //Debug.Log(verticesList.Count);
         if (verticesList.Count > 65000)
         {
             mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
@@ -446,7 +391,6 @@ public class MarchingSquare : MonoBehaviour
         mesh.vertices = verticesList.ToArray();
         mesh.triangles = trianglesList.ToArray();
 
-
         this.GetComponent<MeshRenderer>().material = parentScript.mat;
         mesh.RecalculateBounds();
         mesh.RecalculateNormals();
@@ -454,17 +398,7 @@ public class MarchingSquare : MonoBehaviour
 
         GetComponent<MeshCollider>().convex = false;
         GetComponent<MeshCollider>().sharedMesh = mesh;
-
-
-        st.Stop();
-
-        //Debug.Log($"<color=yellow>Performance: call march operation took {st.ElapsedMilliseconds} milliseconds</color>");
-
-
-
-
     }
-
 
     public void CopyMesh(Mesh meshToCopy)
     {
@@ -517,6 +451,16 @@ public class MarchingSquare : MonoBehaviour
 
         var renderer = newPart.AddComponent<MeshRenderer>();
         renderer.materials = this.GetComponent<MeshRenderer>().materials;
+
+        Vector2[] uvs = new Vector2[mesh.vertices.Length]; // create a new array of UV coordinates
+
+        // set the UV coordinates for each vertex
+        for (int i = 0; i < uvs.Length; i++)
+        {
+            uvs[i] = new Vector2(mesh.vertices[i].x, mesh.vertices[i].z); // set the UV coordinates based on the vertex position
+        }
+
+        mesh.uv = uvs;
 
         if (parentScript.typeOfFragElimination) 
         {
@@ -763,9 +707,8 @@ public class MarchingSquare : MonoBehaviour
 
 
     }
+   
 }
-
-
 
 
 [Serializable]
@@ -781,12 +724,8 @@ public class Chunk
     public List<MarchingSquarePoint> listOfObjInChunk = new List<MarchingSquarePoint>();
 }
 
-
-
-
 public class MarchingSquarePoint
 {
-
     public Vector3 position;
     public bool state;
     public float weigth;

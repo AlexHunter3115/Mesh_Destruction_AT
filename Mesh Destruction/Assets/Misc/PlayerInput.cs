@@ -64,9 +64,36 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""Granade"",
+                    ""type"": ""Button"",
+                    ""id"": ""1606ba4e-26d8-403a-b5bd-4a5609430193"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Ability"",
                     ""type"": ""Button"",
                     ""id"": ""451f8dc6-9572-4459-b6b8-c4f41ce70319"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""14945921-9be2-4c69-b072-6f4353e67357"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Esc"",
+                    ""type"": ""Button"",
+                    ""id"": ""59f8cb4e-500a-45b4-8ac6-4d7166c0c3d8"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -183,6 +210,39 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""action"": ""Ability"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""76895549-247f-4f65-a26a-33b115e568b3"",
+                    ""path"": ""<Keyboard>/g"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Granade"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""869a888a-3872-4181-bae8-71cf4817256e"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""10ab478e-67d7-4cdc-aa65-ce65bb517f39"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Esc"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -195,7 +255,10 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         m_playerActions_Look = m_playerActions.FindAction("Look", throwIfNotFound: true);
         m_playerActions_Shoot = m_playerActions.FindAction("Shoot", throwIfNotFound: true);
         m_playerActions_Reload = m_playerActions.FindAction("Reload", throwIfNotFound: true);
+        m_playerActions_Granade = m_playerActions.FindAction("Granade", throwIfNotFound: true);
         m_playerActions_Ability = m_playerActions.FindAction("Ability", throwIfNotFound: true);
+        m_playerActions_Interact = m_playerActions.FindAction("Interact", throwIfNotFound: true);
+        m_playerActions_Esc = m_playerActions.FindAction("Esc", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -259,7 +322,10 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
     private readonly InputAction m_playerActions_Look;
     private readonly InputAction m_playerActions_Shoot;
     private readonly InputAction m_playerActions_Reload;
+    private readonly InputAction m_playerActions_Granade;
     private readonly InputAction m_playerActions_Ability;
+    private readonly InputAction m_playerActions_Interact;
+    private readonly InputAction m_playerActions_Esc;
     public struct PlayerActionsActions
     {
         private @PlayerInput m_Wrapper;
@@ -268,7 +334,10 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         public InputAction @Look => m_Wrapper.m_playerActions_Look;
         public InputAction @Shoot => m_Wrapper.m_playerActions_Shoot;
         public InputAction @Reload => m_Wrapper.m_playerActions_Reload;
+        public InputAction @Granade => m_Wrapper.m_playerActions_Granade;
         public InputAction @Ability => m_Wrapper.m_playerActions_Ability;
+        public InputAction @Interact => m_Wrapper.m_playerActions_Interact;
+        public InputAction @Esc => m_Wrapper.m_playerActions_Esc;
         public InputActionMap Get() { return m_Wrapper.m_playerActions; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -290,9 +359,18 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Reload.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnReload;
                 @Reload.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnReload;
                 @Reload.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnReload;
+                @Granade.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnGranade;
+                @Granade.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnGranade;
+                @Granade.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnGranade;
                 @Ability.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnAbility;
                 @Ability.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnAbility;
                 @Ability.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnAbility;
+                @Interact.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnInteract;
+                @Interact.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnInteract;
+                @Interact.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnInteract;
+                @Esc.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnEsc;
+                @Esc.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnEsc;
+                @Esc.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnEsc;
             }
             m_Wrapper.m_PlayerActionsActionsCallbackInterface = instance;
             if (instance != null)
@@ -309,9 +387,18 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Reload.started += instance.OnReload;
                 @Reload.performed += instance.OnReload;
                 @Reload.canceled += instance.OnReload;
+                @Granade.started += instance.OnGranade;
+                @Granade.performed += instance.OnGranade;
+                @Granade.canceled += instance.OnGranade;
                 @Ability.started += instance.OnAbility;
                 @Ability.performed += instance.OnAbility;
                 @Ability.canceled += instance.OnAbility;
+                @Interact.started += instance.OnInteract;
+                @Interact.performed += instance.OnInteract;
+                @Interact.canceled += instance.OnInteract;
+                @Esc.started += instance.OnEsc;
+                @Esc.performed += instance.OnEsc;
+                @Esc.canceled += instance.OnEsc;
             }
         }
     }
@@ -322,6 +409,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnShoot(InputAction.CallbackContext context);
         void OnReload(InputAction.CallbackContext context);
+        void OnGranade(InputAction.CallbackContext context);
         void OnAbility(InputAction.CallbackContext context);
+        void OnInteract(InputAction.CallbackContext context);
+        void OnEsc(InputAction.CallbackContext context);
     }
 }

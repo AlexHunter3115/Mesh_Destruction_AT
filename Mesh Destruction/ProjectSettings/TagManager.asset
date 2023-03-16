@@ -7,11 +7,12 @@ TagManager:
   - Wall
   - Wall1
   - Wall2
+  - FxTemporaire
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
   - Wall1
@@ -19,9 +20,9 @@ TagManager:
   - innerWall
   - outerWall
   - SeeThroughObj
-  - 
-  - 
-  - 
+  - Granade
+  - Enemy
+  - Interactable
   - 
   - 
   - 

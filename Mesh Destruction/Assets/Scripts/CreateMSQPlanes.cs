@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class CreateMSQPlanes : MonoBehaviour
 {
+  
+
 
 
     public GameObject topLeft;
     public GameObject topRight;
     public GameObject botRight;
     public GameObject botLeft;
-
 
     public GameObject innerWall2;
     public GameObject outerWall2;
@@ -20,6 +21,14 @@ public class CreateMSQPlanes : MonoBehaviour
     [Space(4)]
     [Header("Designer stuff")]
     public float distance = 0.1f;
+
+    [Header("When the game starts hide the white pillar")]
+    public bool hidePillars = false;
+    [SerializeField] GameObject pillar2;
+    [SerializeField] GameObject pillar1;
+
+    [Header("multiplier depedning on strength of material, the higher the more fragile")]
+    public float strengthOfObject = 1;
 
     [Range(0.1f,0.95f)]
     public float energyLossMultiplier;
@@ -51,6 +60,12 @@ public class CreateMSQPlanes : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        if (hidePillars) 
+        {
+            pillar1.SetActive(false);
+            pillar2.SetActive(false);
+        }
 
         #region innerWall2
 
