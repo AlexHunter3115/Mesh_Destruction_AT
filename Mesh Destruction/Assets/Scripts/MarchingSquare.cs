@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -57,15 +55,15 @@ public class MarchingSquare : MonoBehaviour
                 {
                     for (int j = 0; j < chunkSize; j++)
                     {
-                        if (row + i < marchingPoints.GetLength(0) && col + j < marchingPoints.GetLength(1)) 
+                        if (row + i < marchingPoints.GetLength(0) && col + j < marchingPoints.GetLength(1))
                         {
-                            chunks[chunks.Count - 1].listOfObjInChunk.Add(marchingPoints[row + i, col + j]);   
-                            
+                            chunks[chunks.Count - 1].listOfObjInChunk.Add(marchingPoints[row + i, col + j]);
+
                             if (i == 0 && j == 0) //first pass
                             {
                                 chunks[chunks.Count - 1].bottomLeft = new Vector2Int(row + i, col + j);
                             }
-                            else 
+                            else
                             {
                                 chunks[chunks.Count - 1].topRight = new Vector2Int(row + i, col + j);
                             }
@@ -85,7 +83,7 @@ public class MarchingSquare : MonoBehaviour
     /// <param name="distanceEffect"></param>
     /// <param name="direction"></param>
     /// <param name="wall">false if its needs to propegate</param>
-    public void ImpactReceiver(Vector3 impactPoint, float distanceEffect, Vector3 direction,float multi, AnimationCurve graph, bool wall = false)
+    public void ImpactReceiver(Vector3 impactPoint, float distanceEffect, Vector3 direction, float multi, AnimationCurve graph, bool wall = false)
     {
         marchingPoints = otherWallMarchinSquare.marchingPoints;
 
@@ -121,7 +119,7 @@ public class MarchingSquare : MonoBehaviour
             indexesToDraw.Add(wantedIDX - 1);
             indexesToDraw.Add(wantedIDX + 1);
 
-            indexesToDraw.Add(wantedIDX + size); 
+            indexesToDraw.Add(wantedIDX + size);
             indexesToDraw.Add(wantedIDX - size);
 
             indexesToDraw.Add(indexesToDraw[4] + 1);
@@ -131,7 +129,7 @@ public class MarchingSquare : MonoBehaviour
 
             foreach (var chunkIndex in indexesToDraw)
             {
-                if (chunkIndex < 0 || chunkIndex >= chunks.Count) 
+                if (chunkIndex < 0 || chunkIndex >= chunks.Count)
                 {
                     continue;
                 }
@@ -193,17 +191,12 @@ public class MarchingSquare : MonoBehaviour
 
     private void FloodFillSetup()
     {
-
-        Stopwatch st = new Stopwatch();
-        st.Start();
-
-
         foreach (var point in marchingPoints)
         {
             point.state = false;
         }
 
-        //int iter = 0;
+        int iter = 0;
 
         List<Vector2Int> coords = new List<Vector2Int>();
 
@@ -232,23 +225,28 @@ public class MarchingSquare : MonoBehaviour
             if (done)
                 break;
 
-           
+
             var wantedCoord = coords[Random.Range(0, coords.Count)];  //pick a random coord from the choosen ones
 
             FloodCall(wantedCoord.x, wantedCoord.y);
+            //FloodFill(new Vector2Int( wantedCoord.x, wantedCoord.y));
 
             if (floodListMarching.Count > 1)
             {
                 bool toDel = true;
 
-                foreach (var point in floodListMarching)
+                for (int i = 0; i < floodListMarching.Count; i++)
                 {
-                    if (point.idx.x == 0 || point.idx.y == 0 || point.idx.x == marchingPoints.GetLength(1) - 1 || point.idx.y == marchingPoints.GetLength(0) - 1)
+                    if (floodListMarching[i].idx.x == 0 || floodListMarching[i].idx.y == 0 || floodListMarching[i].idx.x == marchingPoints.GetLength(1) - 1 || floodListMarching[i].idx.y == marchingPoints.GetLength(0) - 1)
                     {
                         toDel = false;
                         break;
                     }
                 }
+
+                //Debug.Log(floodListMarching.Count);
+
+               // Debug.Log($"{toDel}");
 
                 if (toDel)
                 {
@@ -256,54 +254,53 @@ public class MarchingSquare : MonoBehaviour
 
                     int counter = 0;
 
-                    foreach (var point in floodListMarching)
+                    for (int i = 0; i < floodListMarching.Count; i++)
                     {
                         if (parentScript.voronoiNum < 2)
                         {
 
-                            if (point.weigth <= 0.95f)
+                            if (floodListMarching[i].weigth <= 0.95f)
                             {
-                                vectorOfVectors.Add(point.position);
+                                vectorOfVectors.Add(floodListMarching[i].position);
 
                                 if (this.transform.localPosition.x > 0)
-                                    vectorOfVectors.Add(new Vector3(point.position.x - 0.05f, point.position.y, point.position.z));
+                                    vectorOfVectors.Add(new Vector3(floodListMarching[i].position.x - 0.05f, floodListMarching[i].position.y, floodListMarching[i].position.z));
                                 else
-                                    vectorOfVectors.Add(new Vector3(point.position.x + 0.05f, point.position.y, point.position.z));
+                                    vectorOfVectors.Add(new Vector3(floodListMarching[i].position.x + 0.05f, floodListMarching[i].position.y, floodListMarching[i].position.z));
                             }
                             else
                             {
                                 counter++;
                             }
                         }
-                        else 
+                        else
                         {
-                            vectorOfVectors.Add(point.position);
+                            vectorOfVectors.Add(floodListMarching[i].position);
                             if (this.transform.localPosition.x > 0)
-                                vectorOfVectors.Add(new Vector3(point.position.x - 0.05f, point.position.y, point.position.z));
+                                vectorOfVectors.Add(new Vector3(floodListMarching[i].position.x - 0.05f, floodListMarching[i].position.y, floodListMarching[i].position.z));
                             else
-                                vectorOfVectors.Add(new Vector3(point.position.x + 0.05f, point.position.y, point.position.z));
+                                vectorOfVectors.Add(new Vector3(floodListMarching[i].position.x + 0.05f, floodListMarching[i].position.y, floodListMarching[i].position.z));
                         }
-
-                        point.weigth = 0;
+                        floodListMarching[i].weigth = 0;
                     }
 
 
-                    if(parentScript.voronoiNum > 1) 
+                    if (parentScript.voronoiNum > 1)
                     {
                         var voroniOutcome = GeneralUtil.VoronoiDivision(vectorOfVectors, parentScript.voronoiNum);
-                   
-                        foreach (var voronoi in voroniOutcome)
+
+                        for (int i = 0; i < voroniOutcome.Length; i++)
                         {
-                            if (voronoi.Count > 5) 
+                            if (voroniOutcome[i].Count > 5)
                             {
-                                var increOutcom = GeneralUtil.IncrementalConvex(voronoi);
+                                var increOutcom = GeneralUtil.IncrementalConvex(voroniOutcome[i]);
 
                                 if (increOutcom != null)
                                     FormObject(increOutcom.Item1, increOutcom.Item2, this.transform.localPosition.x > 0 ? true : false);
                             }
                         }
                     }
-                    else 
+                    else
                     {
                         var increOutcom = GeneralUtil.IncrementalConvex(vectorOfVectors);
 
@@ -311,19 +308,14 @@ public class MarchingSquare : MonoBehaviour
                             FormObject(increOutcom.Item1, increOutcom.Item2, this.transform.localPosition.x > 0 ? true : false);
                     }
 
-
-
-                    CallMarch();   
+                    CallMarch();
                 }
             }
 
-            //iter++;
+            iter++;
         }
 
-        st.Stop();
-
         //Debug.Log($"<color=yellow>Performance: flood fill operation took {st.ElapsedMilliseconds} milliseconds</color>");
-
     }
 
     private void FloodCall(int x, int y)
@@ -344,6 +336,8 @@ public class MarchingSquare : MonoBehaviour
         }
     }
 
+
+
     private void CallMarch()
     {
         Mesh mesh = GetComponent<MeshFilter>().mesh;
@@ -358,7 +352,7 @@ public class MarchingSquare : MonoBehaviour
             for (int x = 0; x < parentScript.resolutionX; x++)
             {
                 int binary = 0;
-                
+
                 var marchSquareTL = marchingPoints[y, x];    //8
                 var marchSquareTR = marchingPoints[y, x + 1];   //4
 
@@ -386,7 +380,7 @@ public class MarchingSquare : MonoBehaviour
         }
 
         if (inner)
-        trianglesList.Reverse();
+            trianglesList.Reverse();
 
         mesh.vertices = verticesList.ToArray();
         mesh.triangles = trianglesList.ToArray();
@@ -462,12 +456,12 @@ public class MarchingSquare : MonoBehaviour
 
         mesh.uv = uvs;
 
-        if (parentScript.typeOfFragElimination) 
+        if (parentScript.typeOfFragElimination)
         {
-            var delPart =  newPart.AddComponent<ShrinkOnCol>();
+            var delPart = newPart.AddComponent<ShrinkOnCol>();
             delPart.dissapearTimer = parentScript.fragElimTimer;
         }
-        else 
+        else
         {
             var delPart = newPart.AddComponent<DelColOnCol>();
             delPart.dissapearTimer = parentScript.fragElimTimer;
@@ -707,7 +701,10 @@ public class MarchingSquare : MonoBehaviour
 
 
     }
-   
+
+
+
+
 }
 
 

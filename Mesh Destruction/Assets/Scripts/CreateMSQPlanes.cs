@@ -1,12 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CreateMSQPlanes : MonoBehaviour
 {
-  
-
-
 
     public GameObject topLeft;
     public GameObject topRight;
@@ -30,7 +26,7 @@ public class CreateMSQPlanes : MonoBehaviour
     [Header("multiplier depedning on strength of material, the higher the more fragile")]
     public float strengthOfObject = 1;
 
-    [Range(0.1f,0.95f)]
+    [Range(0.1f,1.5f)]
     public float energyLossMultiplier;
 
     public int resolutionX = 60;

@@ -31,19 +31,18 @@ public class Explosive : MonoBehaviour
     {
         bool firtHit = false;
 
-        for (int i = 0; i < Random.Range(100,150); i++)
+        int num = Random.Range(100, 150);
+
+        for (int i = 0; i < num; i++)
         {
             Vector3 direction = Random.insideUnitSphere;
             RaycastHit outHit;
 
-
             if (Physics.Raycast(transform.position, direction, out outHit, maxDistance))
             {
-                Debug.DrawLine(transform.position, outHit.point, Color.red, 5f);
                 if (outHit.transform.GetComponent<MarchingSquare>() != null)
                 {
                     
-
                     Vector3 hitDirection = transform.TransformDirection(outHit.point - transform.position);
 
                     GameObject newRef = Instantiate(PlayerScript.instance.bulletPrefab);
@@ -52,7 +51,6 @@ public class Explosive : MonoBehaviour
                     newRef.transform.parent = outHit.transform;
                     var marchComp = outHit.transform.GetComponent<MarchingSquare>();
 
-
                     if (!firtHit)
                     {
                         marchComp.ImpactReceiver(newRef.transform.localPosition, 8, hitDirection, 1.2f, weightDistribution);
@@ -60,15 +58,9 @@ public class Explosive : MonoBehaviour
                     }
                     else 
                     {
-                        marchComp.ImpactReceiver(newRef.transform.localPosition, 0.5f, hitDirection, 1f, weightDistribution);
+                        marchComp.ImpactReceiver(newRef.transform.localPosition, 2, hitDirection, 1f, weightDistribution);
                     }
-
-
                 }
-            }
-            else
-            {
-                Debug.DrawRay(transform.position, direction * maxDistance, Color.green, 5f);
             }
         }
     }

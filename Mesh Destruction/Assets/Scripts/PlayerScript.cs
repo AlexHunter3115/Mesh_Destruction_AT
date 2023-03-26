@@ -222,16 +222,21 @@ public class PlayerScript : MonoBehaviour
 
     private void MenuCall(InputAction.CallbackContext context) 
     {
-        showMenu = !showMenu;
+        if (!hardMenuCall) 
+        {
+            showMenu = !showMenu;
 
-        if (showMenu) 
-        {
-            Time.timeScale = 0;
+            if (showMenu)
+            {
+                Time.timeScale = 0;
+                Cursor.lockState = CursorLockMode.None;
+            }
+            else
+            {
+                Time.timeScale = 1;
+            }
         }
-        else 
-        {
-            Time.timeScale = 1;
-        }
+      
     }
 
     private void Interact(InputAction.CallbackContext context)
@@ -349,6 +354,8 @@ public class PlayerScript : MonoBehaviour
         {
             gameMessage = "you are dead";
             hardMenuCall = true;
+            Time.timeScale = 0;
+            Cursor.lockState = CursorLockMode.None;
         }
     }
 
@@ -377,7 +384,6 @@ public class PlayerScript : MonoBehaviour
 
     private void OnGUI()
     {
-
         int minutes = Mathf.FloorToInt(currentTime / 60f);
         int seconds = Mathf.FloorToInt(currentTime - minutes * 60f);
         string timeText = string.Format("{0:00}:{1:00}", minutes, seconds);
@@ -391,6 +397,8 @@ public class PlayerScript : MonoBehaviour
             if (GUI.Button(new Rect((Screen.width / 2) - 50, (Screen.height / 2) + 50, 150, 30), "Restart the Game"))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                Time.timeScale = 1;
+                Cursor.lockState = CursorLockMode.Locked;
             }
 
             return;

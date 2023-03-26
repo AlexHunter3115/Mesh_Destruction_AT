@@ -21,7 +21,7 @@ public class ComputerInteractable : MonoBehaviour, IInteractable
                 PlayerScript.instance.SetMessage("This is the right computer well done", Color.green);
                 PlayerScript.instance.SetMessage("You are free to finish your job now", Color.green);
                 PlayerScript.instance.stopTimer = true;
-                PlayerScript.instance.gameMessage = "You did it you found the computer!!";
+                PlayerScript.instance.gameMessage = "You did it you\nfound the computer!!";
             }
             else
             {
