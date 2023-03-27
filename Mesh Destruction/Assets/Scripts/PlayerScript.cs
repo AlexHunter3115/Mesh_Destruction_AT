@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.HID;
@@ -216,6 +215,8 @@ public class PlayerScript : MonoBehaviour
                 currentTime = 0f;
                 hardMenuCall = true;
                 gameMessage = "You Let the\ntime run out\n\n you are dead";
+                Cursor.lockState = CursorLockMode.None;
+                Time.timeScale = 0;
             }
         }
     }

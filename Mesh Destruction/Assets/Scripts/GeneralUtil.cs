@@ -198,14 +198,13 @@ public static class GeneralUtil
     {
         List<Vector3> choosenPoints = new List<Vector3>();
 
-        while (choosenPoints.Count != voronoiPoints) //decided the points
+        for (int i = 0; i < voronoiPoints; i++)
         {
             int ranIdx = Random.Range(0, verticesPoints.Count - 1);
 
-            if (!choosenPoints.Contains(verticesPoints[ranIdx])) 
+            if (!choosenPoints.Contains(verticesPoints[ranIdx]))
                 choosenPoints.Add(verticesPoints[ranIdx]);
-
-        }
+        } 
 
 
         var listOfVoronoi = new List<Vector3>[choosenPoints.Count];

@@ -202,13 +202,13 @@ public class MarchingSquare : MonoBehaviour
 
         while (true)
         {
-            //false means its not been added
             coords.Clear();
             floodListMarching.Clear();
-            //if (iter > 10)
-            //{
-            //    break;
-            //}
+            if (iter > 10)
+            {
+                Debug.Log("this is not supposed to get clled");
+                break;
+            }
 
             bool done = true;
 
@@ -221,10 +221,8 @@ public class MarchingSquare : MonoBehaviour
                 }
             }
 
-
             if (done)
                 break;
-
 
             var wantedCoord = coords[Random.Range(0, coords.Count)];  //pick a random coord from the choosen ones
 
@@ -335,8 +333,6 @@ public class MarchingSquare : MonoBehaviour
             }
         }
     }
-
-
 
     private void CallMarch()
     {
@@ -701,9 +697,6 @@ public class MarchingSquare : MonoBehaviour
 
 
     }
-
-
-
 
 }
 
