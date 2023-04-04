@@ -10299,8 +10299,8 @@ MonoBehaviour:
   speed: 5
   gravity: -9.8
   isGrouded: 0
-  xSens: 30
-  ySens: 30
+  xSens: 15
+  ySens: 15
   Hittable:
     serializedVersion: 2
     m_Bits: 0
